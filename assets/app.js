@@ -6,37 +6,10 @@
     "https://overpass-api.de/api/interpreter",
     "https://overpass.osm.ch/api/interpreter",
   ];
-  function seedPlaces(home) {
-    const raw = [
-      { name: "Barcomi's Kaffeerösterei", cat: "coffee", lat: 52.48962, lon: 13.39385, file: COMMONS.cafe },
-      { name: "Marheineke Markthalle", cat: "grocery", lat: 52.48945, lon: 13.39555, file: COMMONS.market },
-      { name: "Café Liberda", cat: "coffee", lat: 52.4994, lon: 13.4249, file: COMMONS.cafe },
-      { name: "Café Moritzplatz", cat: "coffee", lat: 52.5035, lon: 13.4108, file: COMMONS.cafe2 },
-      { name: "Viktoriapark", cat: "park", lat: 52.4884, lon: 13.3816, file: COMMONS.park },
-      { name: "Chamissokiez gardens", cat: "park", lat: 52.4880, lon: 13.3912, file: COMMONS.street },
-      { name: "Bergmannstraße shops", cat: "eat", lat: 52.4897, lon: 13.3928, file: COMMONS.cafe3 },
-      { name: "Kreuzberg town hall block", cat: "do", lat: 52.4912, lon: 13.3889, file: COMMONS.street },
-    ];
-    return raw.map(function (p) {
-      const dist = haversine(home, p);
-      return {
-        id: p.name,
-        name: p.name,
-        cat: p.cat,
-        lat: p.lat,
-        lon: p.lon,
-        dist: dist,
-        walk: walkMins(dist),
-        tags: {},
-        photo: filePath(p.file),
-      };
-    }).sort(function (a, b) { return a.dist - b.dist; });
-  }
   const OSRM = "https://router.project-osrm.org/route/v1";
   const STYLE = "https://tiles.openfreemap.org/styles/liberty";
   const DEFAULT_Q = "Bergmannstraße 25, 10961 Berlin";
   const WORK = "Alexanderplatz, Berlin";
-
   const COMMONS = {
     street: "Kreuzberg Bergmannstraße Marheineke Markt.jpg",
     market: "Marheineke-Markthalle B-Kreuzberg 06-2017 img1.jpg",
@@ -47,10 +20,6 @@
   };
   function filePath(name) {
     return "https://commons.wikimedia.org/wiki/Special:FilePath/" + encodeURIComponent(name) + "?width=1400";
-  }
-
-  function $(sel, root) {
-    return (root || document).querySelector(sel);
   }
   function haversine(a, b) {
     const R = 6371000;
@@ -64,7 +33,39 @@
   function walkMins(m) {
     return Math.max(1, Math.round(m / 80));
   }
-
+  function seedPlaces(home) {
+    const raw = [
+      { name: "Barcomi's Kaffeerösterei", cat: "coffee", lat: 52.48962, lon: 13.39385, file: COMMONS.cafe },
+      { name: "Marheineke Markthalle", cat: "grocery", lat: 52.48945, lon: 13.39555, file: COMMONS.market },
+      { name: "Café Liberda", cat: "coffee", lat: 52.4994, lon: 13.4249, file: COMMONS.cafe },
+      { name: "Café Moritzplatz", cat: "coffee", lat: 52.5035, lon: 13.4108, file: COMMONS.cafe2 },
+      { name: "Viktoriapark", cat: "park", lat: 52.4884, lon: 13.3816, file: COMMONS.park },
+      { name: "Chamissokiez gardens", cat: "park", lat: 52.488, lon: 13.3912, file: COMMONS.street },
+      { name: "Hasir Kreuzberg", cat: "eat", lat: 52.4897, lon: 13.3928, file: COMMONS.cafe3 },
+      { name: "Kreuzberg Museum block", cat: "do", lat: 52.4912, lon: 13.3889, file: COMMONS.street },
+    ];
+    return raw
+      .map(function (p) {
+        const dist = haversine(home, p);
+        return {
+          id: p.name,
+          name: p.name,
+          cat: p.cat,
+          lat: p.lat,
+          lon: p.lon,
+          dist: dist,
+          walk: walkMins(dist),
+          tags: {},
+          photo: filePath(p.file),
+        };
+      })
+      .sort(function (a, b) {
+        return a.dist - b.dist;
+      });
+  }
+  function $(sel) {
+    return document.querySelector(sel);
+  }
   async function geocode(q) {
     const res = await fetch(PHOTON + "?q=" + encodeURIComponent(q) + "&limit=5&lang=en");
     if (!res.ok) throw new Error("Address lookup failed");
@@ -74,90 +75,101 @@
     const [lon, lat] = f.geometry.coordinates;
     const p = f.properties || {};
     const label = p.name || [p.street, p.housenumber].filter(Boolean).join(" ") || q;
-    const display = [label, p.district, p.city || p.town, p.country].filter(Boolean).join(", ");
-    return { lat: lat, lon: lon, label: label, display: display };
+    return { lat: lat, lon: lon, label: label };
   }
-
   function catOf(t) {
     if (t.amenity === "cafe" || t.shop === "bakery" || t.shop === "coffee") return "coffee";
     if (["supermarket", "convenience", "greengrocer"].indexOf(t.shop) >= 0) return "grocery";
-    if (t.leisure === "park" || t.leisure === "garden" || t.leisure === "nature_reserve") return "park";
+    if (t.leisure === "park" || t.leisure === "garden") return "park";
     if (t.amenity === "restaurant" || t.amenity === "bar") return "eat";
-    if (t.tourism === "attraction" || t.tourism === "museum" || t.amenity === "theatre") return "do";
+    if (t.tourism === "attraction" || t.tourism === "museum") return "do";
     return null;
   }
-
   function nodeCenter(e) {
     if (e.type === "node") return { lat: e.lat, lon: e.lon };
     if (e.center) return { lat: e.center.lat, lon: e.center.lon };
     return null;
   }
-
   function photoFor(place) {
     const t = place.tags || {};
-    if (t.wikimedia_commons) return filePath(t.wikimedia_commons.replace(/^File:/, ""));
+    if (t.wikimedia_commons) return filePath(String(t.wikimedia_commons).replace(/^File:/, ""));
     if (t.image && /^https?:/.test(t.image)) return t.image;
     if (place.cat === "park") return filePath(COMMONS.park);
     if (place.cat === "grocery") return filePath(COMMONS.market);
-    if (place.cat === "coffee") return filePath(place.dist % 2 ? COMMONS.cafe : COMMONS.cafe2);
+    if (place.cat === "coffee") return filePath(place.walk % 2 ? COMMONS.cafe : COMMONS.cafe2);
     if (place.cat === "eat") return filePath(COMMONS.cafe3);
     return filePath(COMMONS.street);
   }
-
   async function fetchPois(home) {
     const q =
-      "[out:json][timeout:25];(" +
-      "nwr(around:1200," + home.lat + "," + home.lon + ")[amenity~\"cafe|restaurant|bar\"][name];" +
-      "nwr(around:1200," + home.lat + "," + home.lon + ")[shop~\"supermarket|bakery|convenience\"][name];" +
-      "nwr(around:1200," + home.lat + "," + home.lon + ")[leisure~\"park|garden\"][name];" +
-      "nwr(around:1200," + home.lat + "," + home.lon + ")[tourism~\"attraction|museum\"][name];" +
-      ");out tags center 80;";
+      "[out:json][timeout:12];(" +
+      "nwr(around:900," +
+      home.lat +
+      "," +
+      home.lon +
+      ")[amenity~\"cafe|restaurant|bar\"][name];" +
+      "nwr(around:900," +
+      home.lat +
+      "," +
+      home.lon +
+      ")[shop~\"supermarket|bakery|convenience\"][name];" +
+      "nwr(around:900," +
+      home.lat +
+      "," +
+      home.lon +
+      ")[leisure~\"park|garden\"][name];" +
+      ");out tags center 50;";
     const body = "data=" + encodeURIComponent(q);
-    let lastErr;
-    for (let i = 0; i < OVERPASS.length; i++) {
-      try {
-        const res = await fetch(OVERPASS[i], {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8" },
-          body: body,
-        });
-        if (!res.ok) throw new Error("overpass " + res.status);
-        const data = await res.json();
-        const seen = {};
-        const out = [];
-        (data.elements || []).forEach(function (e) {
-          const c = nodeCenter(e);
-          const tags = e.tags || {};
-          const cat = catOf(tags);
-          if (!c || !cat || !tags.name) return;
-          const key = tags.name + "|" + cat;
-          if (seen[key]) return;
-          seen[key] = 1;
-          const dist = haversine(home, c);
-          const place = {
-            id: String(e.id),
-            name: tags.name,
-            cat: cat,
-            lat: c.lat,
-            lon: c.lon,
-            dist: dist,
-            walk: walkMins(dist),
-            tags: tags,
-          };
-          place.photo = photoFor(place);
-          out.push(place);
-        });
-        out.sort(function (a, b) {
-          return a.dist - b.dist;
-        });
-        return out.slice(0, 40);
-      } catch (err) {
-        lastErr = err;
+    const ctrl = new AbortController();
+    const t = setTimeout(function () {
+      ctrl.abort();
+    }, 8000);
+    try {
+      for (let i = 0; i < OVERPASS.length; i++) {
+        try {
+          const res = await fetch(OVERPASS[i], {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8" },
+            body: body,
+            signal: ctrl.signal,
+          });
+          if (!res.ok) continue;
+          const data = await res.json();
+          const seen = {};
+          const out = [];
+          (data.elements || []).forEach(function (e) {
+            const c = nodeCenter(e);
+            const tags = e.tags || {};
+            const cat = catOf(tags);
+            if (!c || !cat || !tags.name) return;
+            const key = tags.name + "|" + cat;
+            if (seen[key]) return;
+            seen[key] = 1;
+            const dist = haversine(home, c);
+            const place = {
+              id: String(e.id),
+              name: tags.name,
+              cat: cat,
+              lat: c.lat,
+              lon: c.lon,
+              dist: dist,
+              walk: walkMins(dist),
+              tags: tags,
+            };
+            place.photo = photoFor(place);
+            out.push(place);
+          });
+          out.sort(function (a, b) {
+            return a.dist - b.dist;
+          });
+          if (out.length >= 3) return out.slice(0, 40);
+        } catch (_) {}
       }
+    } finally {
+      clearTimeout(t);
     }
-    throw lastErr || new Error("Places lookup failed");
+    return [];
   }
-
   async function osrmRoute(from, to, profile) {
     const url =
       OSRM +
@@ -179,7 +191,6 @@
     if (!r) throw new Error("no route");
     return { coords: r.geometry.coordinates, meters: r.distance, mins: Math.max(1, Math.round(r.duration / 60)) };
   }
-
   function add3d(map) {
     if (map.getLayer("k3d")) return;
     try {
@@ -198,16 +209,15 @@
       });
     } catch (_) {}
   }
-
   function makeMap(id, center) {
     const ml = window.maplibregl;
     const map = new ml.Map({
       container: id,
       style: STYLE,
       center: [center.lon, center.lat],
-      zoom: 16.2,
-      pitch: 60,
-      bearing: -18,
+      zoom: 16.35,
+      pitch: 58,
+      bearing: -22,
       attributionControl: true,
     });
     map.on("load", function () {
@@ -215,17 +225,24 @@
     });
     return map;
   }
-
-  function pin(map, ll, color, title) {
-    const node = document.createElement("div");
+  function pin(map, ll, color, title, photo) {
+    const node = document.createElement("button");
+    node.type = "button";
     node.title = title || "";
-    node.style.cssText =
-      "width:14px;height:14px;border-radius:50% 50% 50% 0;background:" +
-      color +
-      ";transform:rotate(-45deg);border:2px solid #fff;box-shadow:0 4px 10px rgba(0,0,0,.3)";
-    return new window.maplibregl.Marker({ element: node }).setLngLat([ll.lon, ll.lat]).addTo(map);
+    node.className = "map-pin";
+    if (photo) {
+      node.style.cssText =
+        "width:36px;height:36px;border-radius:50%;border:2px solid #fff;background:#fff url('" +
+        photo +
+        "') center/cover;box-shadow:0 6px 14px rgba(0,0,0,.28);padding:0;cursor:pointer";
+    } else {
+      node.style.cssText =
+        "width:16px;height:16px;border-radius:50% 50% 50% 0;background:" +
+        color +
+        ";transform:rotate(-45deg);border:2px solid #fff;box-shadow:0 4px 10px rgba(0,0,0,.3);padding:0;cursor:pointer";
+    }
+    return new window.maplibregl.Marker({ element: node, anchor: "center" }).setLngLat([ll.lon, ll.lat]).addTo(map);
   }
-
   function drawRoute(map, coords) {
     const geo = { type: "Feature", geometry: { type: "LineString", coordinates: coords } };
     if (map.getSource("trip")) {
@@ -240,7 +257,18 @@
       paint: { "line-color": "#e07a3d", "line-width": 5, "line-opacity": 0.95 },
     });
   }
-
+  function experience(map, coords) {
+    if (!map || !coords || coords.length < 2) return;
+    let i = 0;
+    const step = Math.max(1, Math.floor(coords.length / 70));
+    function tick() {
+      const c = coords[i];
+      map.easeTo({ center: c, zoom: 17.2, pitch: 64, bearing: -22 + i * 0.25, duration: 240 });
+      i += step;
+      if (i < coords.length) setTimeout(tick, 180);
+    }
+    tick();
+  }
   const COPY = [
     {
       id: "walk",
@@ -268,7 +296,6 @@
       p: "Show your buyers a day around your listing, from morning coffee and the school run to errands and dinner nearby.",
     },
   ];
-
   const state = {
     map: null,
     cmap: null,
@@ -276,13 +303,132 @@
     places: [],
     markers: [],
     slide: 0,
-    lifeStep: 1,
+    lastRoute: null,
     household: {},
     interests: {},
     day: { morning: null, afternoon: null, evening: null },
-    daySlot: null,
   };
 
+  function nearest(cat) {
+    return state.places.filter(function (p) {
+      return p.cat === cat;
+    })[0];
+  }
+  function setCard(place, kicker) {
+    const photo = $("#place-photo");
+    if (photo) {
+      photo.hidden = !place.photo;
+      if (place.photo) photo.src = place.photo;
+    }
+    $("#place-card .k").textContent = kicker || place.cat || "Place";
+    $("#win-title").textContent = place.name || place.label;
+    const meta = $("#place-meta");
+    if (meta) meta.textContent = place.walk ? place.walk + " min walk from the door" : place.label || "";
+    const chip = $("#coffee-chip");
+    if (chip && place.walk) {
+      chip.querySelector("strong").textContent = place.cat === "coffee" ? "Coffee" : place.name;
+      chip.querySelector("small").textContent = place.walk + " min walk";
+    }
+    const ft = $("#feat-title");
+    if (ft && state.home) ft.textContent = state.home.label;
+  }
+  async function selectPlace(place) {
+    if (!state.map || !state.home || !place) return;
+    setCard(place, place.cat === "coffee" ? "Coffee" : place.cat);
+    state.map.flyTo({ center: [place.lon, place.lat], zoom: 17, pitch: 62, speed: 0.75 });
+    try {
+      const r = await osrmRoute(state.home, place, "walking");
+      drawRoute(state.map, r.coords);
+      state.lastRoute = r.coords;
+      $("#place-meta").textContent = r.mins + " min walk · " + (r.meters / 1000).toFixed(1) + " km";
+      const chip = $("#coffee-chip");
+      chip.querySelector("small").textContent = r.mins + " min walk";
+    } catch (_) {
+      drawRoute(state.map, [
+        [state.home.lon, state.home.lat],
+        [place.lon, place.lat],
+      ]);
+    }
+  }
+  function clearMarkers() {
+    state.markers.forEach(function (m) {
+      m.remove();
+    });
+    state.markers = [];
+  }
+  function showPins(filter) {
+    if (!state.map || !state.home) return;
+    clearMarkers();
+    state.markers.push(pin(state.map, state.home, "#14110e", state.home.label));
+    const rows = state.places.filter(function (p) {
+      return !filter || filter === "home" || p.cat === filter;
+    });
+    rows.slice(0, 16).forEach(function (p) {
+      const col = p.cat === "coffee" ? "#c45c2d" : p.cat === "park" ? "#3f6b4a" : "#14110e";
+      const usePhoto = p.cat === "coffee" || p.cat === "eat";
+      const m = pin(state.map, p, col, p.name, usePhoto ? p.photo : null);
+      m.getElement().addEventListener("click", function () {
+        selectPlace(p);
+      });
+      state.markers.push(m);
+    });
+  }
+  function renderGallery(tab) {
+    const mapTab = { all: null, parks: "park", nature: "park", restaurants: "eat", cafes: "coffee", do: "do" };
+    const cat = mapTab[tab];
+    let rows = state.places.slice();
+    if (cat) rows = rows.filter(function (p) {
+      return p.cat === cat;
+    });
+    if (!rows.length) rows = [{ name: "Bergmannkiez", cat: "do", photo: filePath(COMMONS.street), walk: 1 }];
+    const hero = rows[0];
+    const hs = $("#hero-shot");
+    hs.innerHTML = '<img alt=""><div class="cap"><h3></h3><p></p></div>';
+    hs.querySelector("img").src = hero.photo;
+    hs.querySelector("h3").textContent = hero.name;
+    hs.querySelector("p").textContent = (hero.walk ? hero.walk + " min walk" : "") + (hero.cat ? " · " + hero.cat : "");
+    hs.onclick = function () {
+      if (hero.lat) selectPlace(hero);
+    };
+    const side = $("#sides");
+    side.innerHTML = "";
+    rows.slice(1, 4).forEach(function (p) {
+      const el = document.createElement("button");
+      el.className = "side-shot";
+      el.type = "button";
+      el.innerHTML = "<img alt=\"\"><span></span>";
+      el.querySelector("img").src = p.photo;
+      el.querySelector("span").textContent = p.name;
+      el.addEventListener("click", function () {
+        selectPlace(p);
+        renderGallery(tab);
+      });
+      side.append(el);
+    });
+    document.querySelectorAll(".tabs button").forEach(function (b) {
+      b.classList.toggle("on", b.getAttribute("data-tab") === tab);
+    });
+  }
+  async function ensureCommute(dest) {
+    if (!state.home || !state.cmap) return;
+    const q = dest || $("#work") && $("#work").value.trim() || WORK;
+    try {
+      const to = await geocode(q);
+      const r = await osrmRoute(state.home, to, "driving");
+      drawRoute(state.cmap, r.coords);
+      state.lastCommute = r.coords;
+      const b = new window.maplibregl.LngLatBounds();
+      b.extend([state.home.lon, state.home.lat]);
+      b.extend([to.lon, to.lat]);
+      state.cmap.fitBounds(b, { padding: 70, pitch: 52, duration: 800 });
+      pin(state.cmap, state.home, "#14110e", "Home");
+      pin(state.cmap, to, "#e07a3d", to.label);
+      $("#c-min").textContent = r.mins + " min";
+      $("#c-km").textContent = (r.meters / 1000).toFixed(1) + " km";
+    } catch (_) {
+      $("#c-min").textContent = "—";
+    }
+  }
   function setSlide(i) {
     state.slide = i;
     document.querySelectorAll(".dots button").forEach(function (b, idx) {
@@ -293,123 +439,25 @@
     });
     $("#q-h").textContent = COPY[i].h;
     $("#q-p").textContent = COPY[i].p;
-    if (i === 0 && state.map) state.map.resize();
     if (i === 3 && state.cmap) {
-      state.cmap.resize();
-      ensureCommute();
+      requestAnimationFrame(function () {
+        state.cmap.resize();
+        ensureCommute();
+      });
     }
     if (i === 2) renderGallery("all");
   }
-
-  function nearest(cat) {
-    return state.places.filter(function (p) {
-      return p.cat === cat;
-    })[0];
-  }
-
-  function renderWalkChip() {
-    const cafe = nearest("coffee");
-    const chip = $("#coffee-chip");
-    if (!chip) return;
-    if (cafe) {
-      chip.querySelector("strong").textContent = "Coffee";
-      chip.querySelector("small").textContent = cafe.walk + " min walk";
-      chip.title = cafe.name;
-    }
-  }
-
-  function clearMarkers() {
-    state.markers.forEach(function (m) {
-      m.remove();
-    });
-    state.markers = [];
-  }
-
-  function showHomePins() {
-    if (!state.map || !state.home) return;
-    clearMarkers();
-    state.markers.push(pin(state.map, state.home, "#14110e", state.home.label));
-    state.places.slice(0, 18).forEach(function (p) {
-      const col = p.cat === "coffee" ? "#c45c2d" : p.cat === "park" ? "#3f6b4a" : "#14110e";
-      const m = pin(state.map, p, col, p.name);
-      m.getElement().style.cursor = "pointer";
-      m.getElement().addEventListener("click", function () {
-        const cafeChip = $("#coffee-chip");
-        cafeChip.querySelector("strong").textContent = p.name;
-        cafeChip.querySelector("small").textContent = p.walk + " min walk";
-        state.map.flyTo({ center: [p.lon, p.lat], zoom: 17, pitch: 62, speed: 0.7 });
-      });
-      state.markers.push(m);
-    });
-  }
-
-  function renderGallery(tab) {
-    const mapTab = { all: null, parks: "park", nature: "park", restaurants: "eat", cafes: "coffee", do: "do" };
-    const cat = mapTab[tab];
-    let rows = state.places.slice();
-    if (cat) rows = rows.filter(function (p) { return p.cat === cat; });
-    if (!rows.length) rows = [{ name: "Bergmannkiez", cat: "do", photo: filePath(COMMONS.street), walk: 1, tags: {} }];
-    const hero = rows[0];
-    const sides = rows.slice(1, 4);
-    const hs = $("#hero-shot");
-    hs.innerHTML =
-      '<img alt="" src="' +
-      hero.photo +
-      '"><div class="cap"><h3></h3><p></p></div>';
-    hs.querySelector("h3").textContent = hero.name;
-    hs.querySelector("p").textContent = (hero.walk ? hero.walk + " min walk · " : "") + (hero.cat || "");
-    const side = $("#sides");
-    side.innerHTML = "";
-    (sides.length ? sides : rows).slice(0, 3).forEach(function (p) {
-      const el = document.createElement("button");
-      el.className = "side-shot";
-      el.type = "button";
-      el.innerHTML = '<img alt=""><span></span>';
-      el.querySelector("img").src = p.photo;
-      el.querySelector("span").textContent = p.name;
-      el.addEventListener("click", function () {
-        rows.unshift(rows.splice(rows.indexOf(p), 1)[0]);
-        renderGallery(tab);
-        if (state.map) state.map.flyTo({ center: [p.lon, p.lat], zoom: 16.5, speed: 0.8 });
-      });
-      side.append(el);
-    });
-    document.querySelectorAll(".tabs button").forEach(function (b) {
-      b.classList.toggle("on", b.getAttribute("data-tab") === tab);
-    });
-  }
-
-  async function ensureCommute() {
-    if (!state.home || !state.cmap) return;
-    try {
-      const to = await geocode(WORK);
-      const r = await osrmRoute(state.home, to, "driving");
-      drawRoute(state.cmap, r.coords);
-      const b = new window.maplibregl.LngLatBounds();
-      b.extend([state.home.lon, state.home.lat]);
-      b.extend([to.lon, to.lat]);
-      state.cmap.fitBounds(b, { padding: 60, pitch: 55, duration: 700 });
-      pin(state.cmap, state.home, "#14110e", "Home");
-      pin(state.cmap, to, "#e07a3d", to.label);
-      $("#c-min").textContent = r.mins + " min";
-      $("#c-km").textContent = (r.meters / 1000).toFixed(1) + " km";
-    } catch (_) {
-      $("#c-min").textContent = "—";
-    }
-  }
-
   function countSel(obj) {
     return Object.keys(obj).filter(function (k) {
       return obj[k];
     }).length;
   }
-
   function renderDay() {
     ["morning", "afternoon", "evening"].forEach(function (slot) {
       const el = document.querySelector('[data-slot="' + slot + '"]');
       const p = state.day[slot];
       if (p) {
-        el.innerHTML = '<img alt=""><h4></h4><p></p>';
+        el.innerHTML = "<img alt=\"\"><h4></h4><p></p>";
         el.querySelector("img").src = p.photo;
         el.querySelector("h4").textContent = p.name;
         el.querySelector("p").textContent = p.walk + " min walk";
@@ -420,13 +468,13 @@
     }).length;
     $("#day-count").textContent = n + " of 3 moments chosen";
   }
-
   function openPicker(slot) {
-    state.daySlot = slot;
     const want = slot === "morning" ? "coffee" : slot === "afternoon" ? "park" : "eat";
-    const rows = state.places.filter(function (p) {
-      return p.cat === want;
-    }).slice(0, 3);
+    const rows = state.places
+      .filter(function (p) {
+        return p.cat === want;
+      })
+      .slice(0, 3);
     const box = $("#picker");
     box.hidden = false;
     $("#picker-title").textContent =
@@ -447,7 +495,6 @@
       row.append(a);
     });
   }
-
   async function loadAddress(q) {
     const query = (q || "").trim();
     if (!query) return;
@@ -457,30 +504,41 @@
       const home = await geocode(query);
       state.home = home;
       $("#win-title").textContent = home.label;
+      const ft = $("#feat-title");
+      if (ft) ft.textContent = home.label;
       if (!state.map) state.map = makeMap("map", home);
-      else state.map.flyTo({ center: [home.lon, home.lat], zoom: 16.2, pitch: 60, speed: 0.8 });
+      else state.map.flyTo({ center: [home.lon, home.lat], zoom: 16.35, pitch: 58, speed: 0.8 });
       if (!state.cmap) state.cmap = makeMap("c-map", home);
+      setTimeout(function () {
+        if (state.map) state.map.resize();
+      }, 80);
       if (loader) loader.hidden = true;
       state.places = seedPlaces(home);
-      showHomePins();
-      renderWalkChip();
+      showPins("home");
+      const cafe = nearest("coffee");
+      if (cafe) {
+        setCard(cafe, "Coffee");
+        $("#place-card .k").textContent = "Home";
+        $("#win-title").textContent = home.label;
+        $("#coffee-chip strong").textContent = "Coffee";
+        $("#coffee-chip small").textContent = cafe.walk + " min walk";
+      }
       renderGallery("all");
-      fetchPois(home)
-        .then(function (live) {
-          if (live && live.length >= 3) {
-            state.places = live;
-            showHomePins();
-            renderWalkChip();
-            if (state.slide === 2) renderGallery("all");
+      fetchPois(home).then(function (live) {
+        if (live && live.length >= 3) {
+          state.places = live;
+          showPins("home");
+          const c = nearest("coffee");
+          if (c) {
+            $("#coffee-chip small").textContent = c.walk + " min walk";
           }
-        })
-        .catch(function () {});
+        }
+      });
     } catch (err) {
       if (loader) loader.hidden = true;
       alert(err.message || "Could not build this Kiez.");
     }
   }
-
   function wire() {
     document.querySelectorAll(".dots button").forEach(function (b, i) {
       b.addEventListener("click", function () {
@@ -498,43 +556,55 @@
         });
         b.setAttribute("aria-pressed", "true");
         const cat = b.getAttribute("data-fly");
-        if (!state.map || !state.home) return;
-        if (cat === "home") {
-          state.map.flyTo({ center: [state.home.lon, state.home.lat], zoom: 16.2, pitch: 60, speed: 0.8 });
+        showPins(cat);
+        if (cat === "home" && state.home) {
+          state.map.flyTo({ center: [state.home.lon, state.home.lat], zoom: 16.35, pitch: 58, speed: 0.8 });
           $("#place-card .k").textContent = "Home";
           $("#win-title").textContent = state.home.label;
           return;
         }
         const p = nearest(cat);
-        if (!p) return;
-        state.map.flyTo({ center: [p.lon, p.lat], zoom: 17, pitch: 62, speed: 0.8 });
-        $("#place-card .k").textContent = cat;
-        $("#win-title").textContent = p.name;
-        $("#coffee-chip strong").textContent = p.name;
-        $("#coffee-chip small").textContent = p.walk + " min walk";
+        if (p) selectPlace(p);
       });
     });
+    const play = $("#play-route");
+    if (play)
+      play.addEventListener("click", function () {
+        if (state.lastRoute) experience(state.map, state.lastRoute);
+        else {
+          const p = nearest("coffee");
+          if (p) selectPlace(p).then(function () {
+            if (state.lastRoute) experience(state.map, state.lastRoute);
+          });
+        }
+      });
     document.querySelectorAll(".hh").forEach(function (btn) {
       btn.addEventListener("click", function () {
         const k = btn.getAttribute("data-k");
         state.household[k] = !state.household[k];
-        btn.classList.toggle("on", state.household[k]);
+        btn.classList.toggle("on", !!state.household[k]);
         $("#hh-n").textContent = countSel(state.household) + " selected";
+        $("#life-next").disabled = countSel(state.household) < 1;
       });
     });
     document.querySelectorAll(".int").forEach(function (btn) {
       btn.addEventListener("click", function () {
         const k = btn.getAttribute("data-k");
         state.interests[k] = !state.interests[k];
-        btn.classList.toggle("on", state.interests[k]);
+        btn.classList.toggle("on", !!state.interests[k]);
         $("#int-n").textContent = countSel(state.interests) + " selected";
+        $("#life-build").disabled = countSel(state.interests) < 1;
       });
     });
+    $("#life-next").disabled = true;
+    $("#life-build").disabled = true;
     $("#life-next").addEventListener("click", function () {
+      if (countSel(state.household) < 1) return;
       $("#life-1").hidden = true;
       $("#life-2").hidden = false;
     });
     $("#life-build").addEventListener("click", function () {
+      if (countSel(state.interests) < 1) return;
       if (state.interests.coffee) renderGallery("cafes");
       else if (state.interests.dog) renderGallery("parks");
       else renderGallery("all");
@@ -551,14 +621,38 @@
       });
     });
     $("#see-day").addEventListener("click", function () {
-      const p = state.day.morning || state.day.afternoon || state.day.evening;
-      if (p && state.map) {
-        setSlide(0);
-        state.map.flyTo({ center: [p.lon, p.lat], zoom: 16.8, pitch: 62, speed: 0.7 });
+      const seq = ["morning", "afternoon", "evening"]
+        .map(function (s) {
+          return state.day[s];
+        })
+        .filter(Boolean);
+      if (!seq.length || !state.map) return;
+      document.querySelector(".cream-hero").scrollIntoView({ behavior: "smooth", block: "start" });
+      selectPlace(seq[0]);
+      let i = 1;
+      function next() {
+        if (i >= seq.length) return;
+        setTimeout(function () {
+          selectPlace(seq[i]);
+          i += 1;
+          next();
+        }, 2200);
       }
+      next();
     });
+    const workForm = $("#work-form");
+    if (workForm) {
+      workForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        ensureCommute();
+      });
+    }
+    const playC = $("#play-commute");
+    if (playC)
+      playC.addEventListener("click", function () {
+        if (state.lastCommute && state.cmap) experience(state.cmap, state.lastCommute);
+      });
   }
-
   window.Kiez = {
     boot: async function () {
       wire();

@@ -27,7 +27,7 @@
       <div>
         <h1>Help buyers picture life around your listing.</h1>
         <p class="lede">Turn a Berlin address into an interactive neighborhood tour your buyers can explore before a showing.</p>
-        <a class="btn-dark" href="#map-stage">Open the map</a>
+        <a class="btn-dark" href="#map-stage">Book a demo</a>
       </div>
       <div class="stage" id="map-stage">
         <div id="map" role="application" aria-label="Berlin neighborhood map"></div>
@@ -45,8 +45,11 @@
         </div>
         <div class="chip" id="coffee-chip"><strong>Coffee</strong><small>timing walk…</small></div>
         <div class="place-float" id="place-card">
+          <img id="place-photo" alt="" hidden />
           <div class="k">Home</div>
           <h3 id="win-title">Bergmannstraße 25</h3>
+          <p id="place-meta">Kreuzberg, Berlin</p>
+          <button type="button" id="play-route">Experience trip</button>
         </div>
       </div>
     </section>
@@ -122,9 +125,13 @@
             <div class="pane" data-pane="commute" hidden>
               <div id="c-map" role="application" aria-label="Commute map"></div>
               <div class="commute-overlay">
+                <form id="work-form" class="work-form">
+                  <input id="work" value="Alexanderplatz, Berlin" aria-label="Workplace" />
+                  <button type="submit">Time it</button>
+                </form>
                 <div><b id="c-min">—</b><small>Total drive</small></div>
                 <div><b id="c-km">—</b><small>Distance</small></div>
-                <div class="mode-pill">By car ↗</div>
+                <button type="button" class="mode-pill" id="play-commute">By car ↗</button>
               </div>
             </div>
 
