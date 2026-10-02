@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Kiez — Explore life around a Berlin listing</title>
-  <meta name="description" content="Turn a Berlin address into an interactive Kiez tour: streets, cafés with photos, commutes and a day around the listing. Independent prototype, not affiliated with Mirai." />
+  <meta name="description" content="Turn a Berlin address into an interactive neighborhood tour. Independent prototype, not affiliated with Mirai." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -12,228 +12,198 @@
   <link rel="stylesheet" href="assets/styles.css" />
 </head>
 <body>
-  <div class="cream">
-    <header class="top">
-      <a class="brand" href="index.html">Kiez</a>
-      <nav class="nav">
-        <a href="#preview">Preview</a>
-        <a href="#process">Process</a>
-        <a href="#features">Features</a>
-        <a href="#use-cases">Use Cases</a>
-      </nav>
-      <button class="signin" type="button" title="Accounts aren't live in this prototype." aria-disabled="true">Sign in</button>
-    </header>
-    <section class="cream-hero" id="main">
-      <div>
-        <h1>Help buyers picture life around your listing.</h1>
-        <p class="lede">Turn a Berlin address into an interactive neighborhood tour your buyers can explore before a showing.</p>
-        <a class="btn-dark" href="#map-stage">Book a demo</a>
+  <header class="nav">
+    <a class="brand" href="index.html">Kiez</a>
+    <nav class="nav-links">
+      <a href="#preview">Preview</a>
+      <a href="#process">Process</a>
+      <a href="#features">Features</a>
+      <a href="#use-cases">Use Cases</a>
+    </nav>
+    <button class="signin" type="button" aria-disabled="true" title="Accounts aren't live.">Sign in</button>
+  </header>
+
+  <section class="hero" id="main">
+    <div class="hero-copy">
+      <h1>Help buyers picture life around your listing.</h1>
+      <p class="lede">Turn a Berlin address into an interactive neighborhood tour your buyers can explore before a showing.</p>
+      <a class="btn" href="#map">Book a demo</a>
+    </div>
+    <div class="stage">
+      <div id="map" role="application" aria-label="Berlin neighborhood map"></div>
+      <div class="loader" id="loader">Building this Kiez…</div>
+      <form class="addr" id="addr-form">
+        <input id="address" value="Bergmannstraße 25, 10961 Berlin" aria-label="Listing address" />
+        <button type="submit">Create</button>
+      </form>
+      <div class="chips" role="toolbar">
+        <button type="button" data-fly="home" aria-pressed="true">Home</button>
+        <button type="button" data-fly="coffee">Coffee</button>
+        <button type="button" data-fly="grocery">Grocery</button>
+        <button type="button" data-fly="park">Park</button>
+        <button type="button" data-fly="eat">Restaurant</button>
       </div>
-      <div class="stage" id="map-stage">
-        <div id="map" role="application" aria-label="Berlin neighborhood map"></div>
-        <div class="loader" id="loader">Building this Kiez…</div>
-        <form class="addr-float" id="addr-form">
-          <input id="address" value="Bergmannstraße 25, 10961 Berlin" aria-label="Listing address" />
-          <button type="submit">Create</button>
-        </form>
-        <div class="cats-float" role="toolbar" aria-label="Place filters">
-          <button type="button" data-fly="home" aria-pressed="true">Home</button>
-          <button type="button" data-fly="coffee">Coffee</button>
-          <button type="button" data-fly="grocery">Grocery</button>
-          <button type="button" data-fly="park">Park</button>
-          <button type="button" data-fly="eat">Restaurant</button>
-          <button type="button" data-fly="gym">Gym</button>
+      <div class="card" id="place-card">
+        <img id="place-photo" alt="" hidden />
+        <div class="k">Home</div>
+        <h3 id="place-name">Bergmannstraße 25</h3>
+        <p id="place-meta">Kreuzberg, Berlin</p>
+        <button class="btn" type="button" id="play-route">Experience trip</button>
+      </div>
+      <div class="journey" id="journey" hidden>
+        <div class="j-bar">
+          <button type="button" data-j="street">Street</button>
+          <button type="button" data-j="walk">Walk</button>
+          <button type="button" data-j="arrive">Arrive</button>
+          <button type="button" data-j="inside">Inside</button>
+          <button type="button" class="j-x" id="j-close">Back to map</button>
         </div>
-        <div class="variants" id="variants"></div>
-        <div class="chip" id="coffee-chip"><strong>Coffee</strong><small>timing walk…</small></div>
-        <div class="place-float" id="place-card">
-          <img id="place-photo" alt="" hidden />
-          <div class="k">Home</div>
-          <h3 id="win-title">Bergmannstraße 25</h3>
-          <p id="place-meta">Kreuzberg, Berlin</p>
-          <button type="button" id="play-route">Experience trip</button>
+        <img id="j-img" alt="" />
+        <p id="j-cap"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="preview">
+    <p class="kicker">PREVIEW</p>
+    <h2>Let your buyers explore around your listing</h2>
+    <p class="sub">Pick a café, the market hall or a gym. Experience trip walks the live route, then an illustrative interior — labeled as generated, not a verified photo of that room.</p>
+  </section>
+  <section class="band" id="gap">
+    <p class="kicker">THE GAP</p>
+    <h2>A listing doesn’t need to stop at the property line</h2>
+    <div class="gap">
+      <div class="files" aria-hidden="true">
+        <span>Listing photos + Grundriss</span>
+        <span>Maps</span>
+        <span>Kiez_report_v3.pdf</span>
+        <span>Shortlist.xlsx</span>
+        <span>Sunday walk-by</span>
+      </div>
+      <p class="sub">Buyers already see the Wohnung. To understand the Kiez they still jump between Maps, portals, PDFs and a walk-by. Kiez is the missing layer.</p>
+    </div>
+  </section>
+  <section class="band" id="process">
+    <p class="kicker">PROCESS</p>
+    <h2>One address in, a whole neighborhood out</h2>
+    <div class="steps">
+      <div><h3>Add an address</h3><p>Any Berlin listing pin.</p></div>
+      <div><h3>Create the experience</h3><p>Streets, places and minutes from OpenStreetMap.</p></div>
+      <div><h3>Share it anywhere</h3><p>The URL is the tour.</p></div>
+    </div>
+  </section>
+
+  <section class="features" id="features">
+    <p class="kicker"><i></i> QUESTIONS YOUR BUYERS ASK</p>
+    <h2 id="q-h">What does the walk around this home feel like?</h2>
+    <p class="lede" id="q-p">Explore the streets beyond the front door, then step inside a nearby place.</p>
+    <div class="win-wrap">
+      <div class="win">
+        <div class="win-bar">
+          <div class="traffic" aria-hidden="true"><b></b><b></b><b></b></div>
+          <span id="feat-title">Bergmannstraße 25</span>
         </div>
-        <div class="journey" id="journey" hidden>
-          <div class="j-bar">
-            <button type="button" data-j="street">Street</button>
-            <button type="button" data-j="walk">Walk</button>
-            <button type="button" data-j="arrive">Arrive</button>
-            <button type="button" data-j="inside">Inside</button>
-            <button type="button" id="j-close" class="j-x">Back to map</button>
+        <div class="win-body">
+          <div class="pane" data-pane="walk">
+            <img class="walk-still" src="assets/img/street-walk.webp" alt="" />
           </div>
-          <img id="j-img" alt="" />
-          <p id="j-cap"></p>
-        </div>
-      </div>
-    </section>
-
-    <section class="band cream-band" id="preview">
-      <p class="kicker"><i></i> PREVIEW</p>
-      <h2>Let your buyers explore around your listing</h2>
-      <p class="sub">Give them the streets, bakeries, parks and U-Bahn walks around a Berlin home — without sending another PDF.</p>
-    </section>
-    <section class="band cream-band" id="gap">
-      <p class="kicker"><i></i> THE GAP</p>
-      <h2>A listing doesn’t need to stop at the property line</h2>
-      <div class="gap">
-        <div class="files" aria-hidden="true">
-          <span>Listing photos + Grundriss</span>
-          <span>Maps</span>
-          <span>Kiez_report_v3.pdf</span>
-          <span>Shortlist.xlsx</span>
-          <span>Sunday walk-by</span>
-        </div>
-        <p class="sub">Buyers already see the Wohnung. To understand the Kiez they still jump between Maps, portals, PDFs and a walk-by. Kiez is the missing layer — built from the Berlin address you already have.</p>
-      </div>
-    </section>
-    <section class="band cream-band" id="process">
-      <p class="kicker"><i></i> PROCESS</p>
-      <h2>One address in, a whole neighborhood out</h2>
-      <div class="steps">
-        <div><h3>Add an address</h3><p>Start with any Berlin listing or development pin.</p></div>
-        <div><h3>Create the experience</h3><p>Streets, cafés, parks and minutes — assembled from OpenStreetMap.</p></div>
-        <div><h3>Share it anywhere</h3><p>The URL is the tour. No account, nothing stored on a server.</p></div>
-      </div>
-    </section>
-  </div>
-
-  <div class="frame">
-    <section class="hero" id="features">
-      <div>
-        <p class="kicker"><i></i> QUESTIONS YOUR BUYERS ASK</p>
-        <h1 id="q-h">What does the walk around this home feel like?</h1>
-        <p class="lede" id="q-p">Let your buyers explore the surrounding streets and get a feel for the walk beyond the front door.</p>
-      </div>
-      <div>
-        <div class="win">
-          <div class="win-bar">
-            <div class="traffic" aria-hidden="true"><b></b><b></b><b></b></div>
-            <span id="feat-title">Bergmannstraße 25</span>
+          <div class="pane" data-pane="life" hidden>
+            <div class="quiz" id="life-1">
+              <p class="kicker">YOUR NEXT CHAPTER</p>
+              <h3>Who’s moving in?</h3>
+              <div class="grid2">
+                <button class="pick hh" data-k="you" type="button">You</button>
+                <button class="pick hh" data-k="partner" type="button">Partner</button>
+                <button class="pick hh" data-k="children" type="button">Children</button>
+                <button class="pick hh" data-k="pets" type="button">Pets</button>
+              </div>
+              <div class="quiz-foot"><span id="hh-n">0 selected</span><button type="button" id="life-next" disabled>Next</button></div>
+            </div>
+            <div class="quiz" id="life-2" hidden>
+              <p class="kicker">YOUR NEXT CHAPTER</p>
+              <h3>What matters in everyday life?</h3>
+              <div class="grid2">
+                <button class="pick int" data-k="coffee" type="button">Coffee &amp; bakery</button>
+                <button class="pick int" data-k="dog" type="button">Dog-friendly</button>
+                <button class="pick int" data-k="music" type="button">Live music</button>
+                <button class="pick int" data-k="hike" type="button">Parks &amp; trails</button>
+              </div>
+              <div class="quiz-foot"><span id="int-n">0 selected</span><button class="go" type="button" id="life-build" disabled>Build my story</button></div>
+            </div>
           </div>
-          <div class="win-body">
-            <div class="pane" data-pane="walk">
-              <img class="walk-still" src="assets/img/street-walk.webp" alt="Street around a Berlin listing" />
-              <div class="chip"><strong>Coffee</strong><small>1 min walk</small></div>
-            </div>
-
-            <div class="pane" data-pane="life" hidden>
-              <div class="quiz" id="life-1">
-                <div class="eyebrow">
-                  <span>YOUR NEXT CHAPTER</span>
-                  <div class="steps-n"><span class="done">✓</span><span class="on">02</span><span>03</span></div>
-                </div>
-                <h2>Who’s moving in?</h2>
-                <div class="grid2">
-                  <button class="pick hh" data-k="you" type="button"><span class="ico">🏠</span> You<span class="radio"></span></button>
-                  <button class="pick hh" data-k="partner" type="button"><span class="ico">💑</span> Partner<span class="radio"></span></button>
-                  <button class="pick hh" data-k="children" type="button"><span class="ico">🧒</span> Children<span class="radio"></span></button>
-                  <button class="pick hh" data-k="pets" type="button"><span class="ico">🐾</span> Pets<span class="radio"></span></button>
-                </div>
-                <div class="quiz-foot"><span id="hh-n">0 selected</span><button type="button" id="life-next">Next →</button></div>
+          <div class="pane" data-pane="places" hidden>
+            <div class="gallery">
+              <div class="tabs">
+                <button class="on" data-tab="all" type="button">All</button>
+                <button data-tab="coffee" type="button">Cafés</button>
+                <button data-tab="eat" type="button">Restaurants</button>
+                <button data-tab="park" type="button">Parks</button>
+                <button data-tab="gym" type="button">Gyms</button>
               </div>
-              <div class="quiz" id="life-2" hidden>
-                <div class="eyebrow">
-                  <span>YOUR NEXT CHAPTER</span>
-                  <div class="steps-n"><span class="done">✓</span><span class="done">✓</span><span class="on">03</span></div>
-                </div>
-                <h2>What matters in your everyday life?</h2>
-                <div class="grid2">
-                  <button class="pick int" data-k="coffee" type="button"><span class="ico">🥐</span> Coffee &amp; bakery mornings<span class="radio"></span></button>
-                  <button class="pick int" data-k="dog" type="button"><span class="ico">🐕</span> Dog-friendly routines<span class="radio"></span></button>
-                  <button class="pick int" data-k="music" type="button"><span class="ico">🎵</span> Live music<span class="radio"></span></button>
-                  <button class="pick int" data-k="hike" type="button"><span class="ico">🥾</span> Hiking &amp; trails<span class="radio"></span></button>
-                </div>
-                <div class="quiz-foot"><span id="int-n">0 selected</span><button class="go" type="button" id="life-build">Build my story →</button></div>
-              </div>
-            </div>
-
-            <div class="pane" data-pane="places" hidden>
-              <div class="gallery">
-                <div class="tabs">
-                  <button class="on" data-tab="all" type="button">All places</button>
-                  <button data-tab="parks" type="button">Parks</button>
-                  <button data-tab="nature" type="button">Nature</button>
-                  <button data-tab="restaurants" type="button">Restaurants</button>
-                  <button data-tab="cafes" type="button">Cafés</button>
-                  <button data-tab="do" type="button">Things to do</button>
-                </div>
-                <div class="g-layout">
-                  <div class="hero-shot" id="hero-shot"></div>
-                  <div class="sides" id="sides"></div>
-                </div>
-              </div>
-            </div>
-
-            <div class="pane" data-pane="commute" hidden>
-              <div id="c-map" role="application" aria-label="Commute map"></div>
-              <div class="commute-overlay">
-                <form id="work-form" class="work-form">
-                  <input id="work" value="Alexanderplatz, Berlin" aria-label="Workplace" />
-                  <button type="submit">Time it</button>
-                </form>
-                <div><b id="c-min">—</b><small>Total drive</small></div>
-                <div><b id="c-km">—</b><small>Distance</small></div>
-                <button type="button" class="mode-pill" id="play-commute">By car ↗</button>
-              </div>
-            </div>
-
-            <div class="pane" data-pane="day" hidden>
-              <div class="day">
-                <div class="tl">
-                  <div class="node on"><div>Home</div><i>⌂</i></div>
-                  <div class="node"><div>Morning</div><i>+</i><div>Choose a place</div></div>
-                  <div class="node"><div>Afternoon</div><i>+</i><div>Choose a place</div></div>
-                  <div class="node"><div>Evening</div><i>+</i><div>Choose a place</div></div>
-                  <div class="node on"><div>Home</div><i>⌂</i></div>
-                </div>
-                <div class="day-cards">
-                  <button class="day-card" data-slot="morning" type="button"><span class="ico">☕</span><h4>Morning</h4><p>Start with a coffee</p></button>
-                  <button class="day-card" data-slot="afternoon" type="button"><span class="ico">🌳</span><h4>Afternoon</h4><p>Find a little green</p></button>
-                  <button class="day-card" data-slot="evening" type="button"><span class="ico">🍴</span><h4>Evening</h4><p>Pick a dinner spot</p></button>
-                </div>
-                <div id="picker" hidden>
-                  <h3 id="picker-title" style="font-family:var(--serif);font-weight:500;margin:14px 0 8px">Choose a spot</h3>
-                  <div class="pick-row" id="picker-row"></div>
-                </div>
-                <div class="quiz-foot"><span id="day-count">0 of 3 moments chosen</span><button type="button" id="see-day">See your day →</button></div>
+              <div class="g-layout">
+                <div class="hero-shot" id="hero-shot"></div>
+                <div class="sides" id="sides"></div>
               </div>
             </div>
           </div>
-        </div>
-        <div class="dots" role="tablist" aria-label="Buyer questions">
-          <button class="on" type="button" aria-label="Walk"></button>
-          <button type="button" aria-label="Life"></button>
-          <button type="button" aria-label="Places"></button>
-          <button type="button" aria-label="Commute"></button>
-          <button type="button" aria-label="Day"></button>
+          <div class="pane" data-pane="commute" hidden>
+            <div id="c-map"></div>
+            <div class="commute-overlay">
+              <form id="work-form" class="work-form">
+                <input id="work" value="Alexanderplatz, Berlin" aria-label="Workplace" />
+                <button class="btn" type="submit">Time it</button>
+              </form>
+              <div><b id="c-min">—</b><small>Total drive</small></div>
+              <div><b id="c-km">—</b><small>Distance</small></div>
+            </div>
+          </div>
+          <div class="pane" data-pane="day" hidden>
+            <div class="day">
+              <div class="day-cards">
+                <button class="day-card" data-slot="morning" type="button"><h4>Morning</h4><p>Coffee</p></button>
+                <button class="day-card" data-slot="afternoon" type="button"><h4>Afternoon</h4><p>Park</p></button>
+                <button class="day-card" data-slot="evening" type="button"><h4>Evening</h4><p>Dinner</p></button>
+              </div>
+              <div id="picker" hidden>
+                <div class="pick-row" id="picker-row"></div>
+              </div>
+              <div class="quiz-foot"><span id="day-count">0 of 3</span><button type="button" id="see-day">See your day</button></div>
+            </div>
+          </div>
         </div>
       </div>
-    </section>
-
-    <section class="band" id="use-cases">
-      <p class="kicker"><i></i> USE CASES</p>
-      <h2>For agents, brokerages and developers</h2>
-      <div class="uses">
-        <article>
-          <img src="assets/img/audience-agents.webp" alt="" />
-          <div class="pad"><h3>Real Estate Agents</h3><p>Send a Kiez tour with the exposé so buyers walk the location before a Saturday Besichtigung.</p></div>
-        </article>
-        <article>
-          <img src="assets/img/audience-broker.webp" alt="" />
-          <div class="pad"><h3>Brokerages</h3><p>One neighborhood format across the portfolio.</p></div>
-        </article>
-        <article>
-          <img src="assets/img/audience-dev.webp" alt="" />
-          <div class="pad"><h3>Developers</h3><p>Show the Kiez around a site while the building is still a fence.</p></div>
-        </article>
+      <div class="dots">
+        <button class="on" type="button" aria-label="Walk"></button>
+        <button type="button" aria-label="Life"></button>
+        <button type="button" aria-label="Places"></button>
+        <button type="button" aria-label="Commute"></button>
+        <button type="button" aria-label="Day"></button>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <footer class="site-foot">
-      <div>© 2026 Kiez prototype · Map data © OpenStreetMap · Photos © Wikimedia Commons · Tiles © OpenFreeMap</div>
-      <div>Berlin · Not affiliated with Mirai</div>
-    </footer>
-  </div>
+  <section class="band" id="use-cases">
+    <p class="kicker">USE CASES</p>
+    <h2>For agents, brokerages and developers</h2>
+    <div class="uses">
+      <article>
+        <img src="assets/img/audience-agents.webp" alt="" />
+        <div class="pad"><h3>Real Estate Agents</h3><p>Send a Kiez tour with the exposé before a Saturday Besichtigung.</p></div>
+      </article>
+      <article>
+        <img src="assets/img/audience-broker.webp" alt="" />
+        <div class="pad"><h3>Brokerages</h3><p>One neighborhood format across the portfolio.</p></div>
+      </article>
+      <article>
+        <img src="assets/img/audience-dev.webp" alt="" />
+        <div class="pad"><h3>Developers</h3><p>Show the Kiez around a site while the building is still a fence.</p></div>
+      </article>
+    </div>
+  </section>
+  <footer class="site-foot">
+    <div>© 2026 Kiez prototype · © OpenStreetMap · OpenFreeMap · Wikimedia Commons</div>
+    <div>Berlin · Not affiliated with Mirai</div>
+  </footer>
   <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
   <script src="assets/app.js"></script>
   <script>Kiez.boot();</script>

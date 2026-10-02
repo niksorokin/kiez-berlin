@@ -1,0 +1,17 @@
+[
+  {"name":"Barcomi's Café & Kaffeerösterei","cat":"coffee","lat":52.489026,"lon":13.39338,"rating":4.3,"blurb":"1994 Bergmannkiez roastery — cheesecake, bagels, on-site cakes.","photo":"cafe"},
+  {"name":"Coffee Cult","cat":"coffee","lat":52.489341,"lon":13.393251,"rating":4.7,"blurb":"Busy self-service café for espresso and breakfast.","photo":"cafe2"},
+  {"name":"Jederzeit Café","cat":"coffee","lat":52.489416,"lon":13.392622,"rating":4.6,"blurb":"All-day brunch: shakshuka, bowls, house cakes.","photo":"cafe"},
+  {"name":"Kalimera Café","cat":"coffee","lat":52.489313,"lon":13.394158,"rating":4.8,"blurb":"Greek coffee stall in Marheineke Markthalle.","photo":"market"},
+  {"name":"cuccuma","cat":"coffee","lat":52.490584,"lon":13.394355,"rating":4.4,"blurb":"Two-floor specialty coffee, daily cakes.","photo":"cafe2"},
+  {"name":"Chapter One Coffee","cat":"coffee","lat":52.489785,"lon":13.39569,"rating":4.6,"blurb":"Tiny brew bar: siphon, V60, espresso.","photo":"cafe"},
+  {"name":"Marheineke Markthalle","cat":"grocery","lat":52.48945,"lon":13.39555,"rating":4.4,"blurb":"Historic Markthalle XI. Closed Sundays.","photo":"market"},
+  {"name":"Viktoriapark","cat":"park","lat":52.4884,"lon":13.3816,"rating":4.5,"blurb":"Heritage park on Kreuzberg hill, seasonal waterfall.","photo":"park"},
+  {"name":"Chamissoplatz","cat":"park","lat":52.488,"lon":13.3912,"blurb":"Gründerzeit square with playground and Ökomarkt.","photo":"street"},
+  {"name":"Felix Austria","cat":"eat","lat":52.4891,"lon":13.3941,"rating":4.7,"blurb":"Schnitzel house with a terrace on Bergmannstraße.","photo":"eat"},
+  {"name":"Pagode","cat":"eat","lat":52.4893,"lon":13.3935,"rating":4.3,"blurb":"Long-running Thai kitchen on Bergmannstraße.","photo":"eat"},
+  {"name":"Austria","cat":"eat","lat":52.4892,"lon":13.3948,"rating":4.7,"blurb":"Wiener schnitzel institution since 1993.","photo":"eat"},
+  {"name":"Tibet Haus","cat":"eat","lat":52.4902,"lon":13.3949,"rating":4.6,"blurb":"Momo and curry just off Marheinekeplatz.","photo":"eat"},
+  {"name":"Yoga-Institut Berlin","cat":"gym","lat":52.4894,"lon":13.3929,"rating":4.4,"blurb":"Independent yoga studio on Bergmannstraße.","photo":"street"},
+  {"name":"Black Sheep Athletics","cat":"gym","lat":52.4878,"lon":13.3855,"rating":4.9,"blurb":"CrossFit and HYROX box on Am Tempelhofer Berg.","photo":"street"}
+]
