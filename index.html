@@ -4,203 +4,171 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Kiez — Explore life around a Berlin listing</title>
-  <meta name="description" content="Turn a Berlin address into an interactive neighborhood tour. Streets, places and walks from the front door. Independent prototype, not affiliated with Mirai." />
+  <meta name="description" content="Turn a Berlin address into an interactive Kiez tour: streets, cafés with photos, commutes and a day around the listing. Independent prototype, not affiliated with Mirai." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
   <link rel="stylesheet" href="assets/styles.css" />
 </head>
 <body>
-  <header class="top">
-    <a class="brand" href="index.html">
-      <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true">
-        <rect x="1" y="1" width="20" height="20" fill="none" stroke="#100d0c" stroke-width="1.4"/>
-        <path d="M4 16h14M7 16V7h7v9" fill="none" stroke="#100d0c" stroke-width="1.4"/>
-      </svg>
-      Kiez
-    </a>
-    <nav class="nav">
-      <a href="#preview">Preview</a>
-      <a href="#process">Process</a>
-      <a href="#features">Features</a>
-      <a href="#use-cases">Use Cases</a>
-      <span class="nav-disabled" id="signin" title="Accounts aren't live in this prototype." aria-disabled="true">Sign in (soon)</span>
-    </nav>
-    <a class="btn" href="#map-stage">Try Berlin</a>
-  </header>
+  <div class="frame">
+    <header class="top">
+      <a class="brand" href="index.html">Kiez</a>
+      <nav class="nav">
+        <a href="#preview">Preview</a>
+        <a href="#process">Process</a>
+        <a href="#features">Features</a>
+        <a href="#use-cases">Use Cases</a>
+      </nav>
+      <button class="signin" type="button" title="Accounts aren't live in this prototype." aria-disabled="true">Sign in</button>
+    </header>
 
-  <section class="hero">
-    <div class="hero-copy">
-      <h1>Help buyers picture life around your listing.</h1>
-      <p class="lede">Turn a Berlin address into an interactive Kiez tour your buyers can explore before a showing — streets, places and minutes from the door.</p>
-      <a class="btn" href="#map-stage">Open the map</a>
-    </div>
-    <div class="stage" id="map-stage">
-      <div id="map" role="application" aria-label="Berlin neighborhood map"></div>
-      <div class="loader" id="loader">
-        <div>
-          Building this Kiez
-          <ul>
-            <li class="on">Matching the address</li>
-            <li>Reading the streets</li>
-            <li>Finding nearby places</li>
-            <li>Timing the first walks</li>
-          </ul>
-        </div>
+    <section class="hero" id="features">
+      <div>
+        <p class="kicker"><i></i> QUESTIONS YOUR BUYERS ASK</p>
+        <h1 id="q-h">What does the walk around this home feel like?</h1>
+        <p class="lede" id="q-p">Let your buyers explore the surrounding streets and get a feel for the walk beyond the front door.</p>
       </div>
-      <div class="map-ui">
-        <form class="addr" id="addr-form">
-          <input id="address" name="q" autocomplete="street-address" aria-label="Listing address" value="Bergmannstraße 25, 10961 Berlin" />
-          <button class="go" type="submit">Create</button>
-        </form>
-        <div class="cats" role="toolbar" aria-label="Place filters">
-          <button class="cat" data-cat="home" aria-pressed="true" type="button">Home</button>
-          <button class="cat" data-cat="coffee" aria-pressed="false" type="button">Coffee</button>
-          <button class="cat" data-cat="grocery" aria-pressed="false" type="button">Grocery</button>
-          <button class="cat" data-cat="park" aria-pressed="false" type="button">Park</button>
-          <button class="cat" data-cat="eat" aria-pressed="false" type="button">Restaurant</button>
-        </div>
-        <div class="place-card" id="place-card">
-          <div class="k">Home</div>
-          <h3>Bergmannstraße 25</h3>
-          <p>Kreuzberg, Berlin</p>
-        </div>
-        <div class="trip-card">
-          <h3>Plan your trip</h3>
-          <form id="commute-form">
-            <input id="commute" placeholder="Workplace or school in Berlin" />
-            <div class="row">
-              <select id="mode" aria-label="Mode">
-                <option value="drive">Drive</option>
-                <option value="walk">Walk</option>
-              </select>
-              <button class="btn" type="submit" style="padding:8px 14px">Time it</button>
-            </div>
-          </form>
-          <div class="row" style="margin-top:8px">
-            <button class="btn ghost" id="play-route" type="button" style="padding:8px 14px">Experience trip</button>
-            <button class="btn ghost" id="share" type="button" style="padding:8px 14px">Share</button>
+      <div>
+        <div class="win">
+          <div class="win-bar">
+            <div class="traffic" aria-hidden="true"><b></b><b></b><b></b></div>
+            <span id="win-title">Bergmannstraße 25</span>
           </div>
-          <div class="status" id="status"></div>
+          <div class="win-body">
+            <div class="loader" id="loader">Building this Kiez…</div>
+
+            <div class="pane" data-pane="walk">
+              <div id="map" role="application" aria-label="Berlin neighborhood map"></div>
+              <form class="addr-float" id="addr-form">
+                <input id="address" value="Bergmannstraße 25, 10961 Berlin" aria-label="Listing address" />
+                <button type="submit">Create</button>
+              </form>
+              <div class="chip" id="coffee-chip"><strong>Coffee</strong><small>timing walk…</small></div>
+            </div>
+
+            <div class="pane" data-pane="life" hidden>
+              <div class="quiz" id="life-1">
+                <div class="eyebrow">
+                  <span>YOUR NEXT CHAPTER</span>
+                  <div class="steps-n"><span class="done">✓</span><span class="on">02</span><span>03</span></div>
+                </div>
+                <h2>Who’s moving in?</h2>
+                <div class="grid2">
+                  <button class="pick hh" data-k="you" type="button"><span class="ico">🏠</span> You<span class="radio"></span></button>
+                  <button class="pick hh" data-k="partner" type="button"><span class="ico">💑</span> Partner<span class="radio"></span></button>
+                  <button class="pick hh" data-k="children" type="button"><span class="ico">🧒</span> Children<span class="radio"></span></button>
+                  <button class="pick hh" data-k="pets" type="button"><span class="ico">🐾</span> Pets<span class="radio"></span></button>
+                </div>
+                <div class="quiz-foot"><span id="hh-n">0 selected</span><button type="button" id="life-next">Next →</button></div>
+              </div>
+              <div class="quiz" id="life-2" hidden>
+                <div class="eyebrow">
+                  <span>YOUR NEXT CHAPTER</span>
+                  <div class="steps-n"><span class="done">✓</span><span class="done">✓</span><span class="on">03</span></div>
+                </div>
+                <h2>What matters in your everyday life?</h2>
+                <div class="grid2">
+                  <button class="pick int" data-k="coffee" type="button"><span class="ico">🥐</span> Coffee &amp; bakery mornings<span class="radio"></span></button>
+                  <button class="pick int" data-k="dog" type="button"><span class="ico">🐕</span> Dog-friendly routines<span class="radio"></span></button>
+                  <button class="pick int" data-k="music" type="button"><span class="ico">🎵</span> Live music<span class="radio"></span></button>
+                  <button class="pick int" data-k="hike" type="button"><span class="ico">🥾</span> Hiking &amp; trails<span class="radio"></span></button>
+                </div>
+                <div class="quiz-foot"><span id="int-n">0 selected</span><button class="go" type="button" id="life-build">Build my story →</button></div>
+              </div>
+            </div>
+
+            <div class="pane" data-pane="places" hidden>
+              <div class="gallery">
+                <div class="tabs">
+                  <button class="on" data-tab="all" type="button">All places</button>
+                  <button data-tab="parks" type="button">Parks</button>
+                  <button data-tab="nature" type="button">Nature</button>
+                  <button data-tab="restaurants" type="button">Restaurants</button>
+                  <button data-tab="cafes" type="button">Cafés</button>
+                  <button data-tab="do" type="button">Things to do</button>
+                </div>
+                <div class="g-layout">
+                  <div class="hero-shot" id="hero-shot"></div>
+                  <div class="sides" id="sides"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="pane" data-pane="commute" hidden>
+              <div id="c-map" role="application" aria-label="Commute map"></div>
+              <div class="commute-overlay">
+                <div><b id="c-min">—</b><small>Total drive</small></div>
+                <div><b id="c-km">—</b><small>Distance</small></div>
+                <div class="mode-pill">By car ↗</div>
+              </div>
+            </div>
+
+            <div class="pane" data-pane="day" hidden>
+              <div class="day">
+                <div class="tl">
+                  <div class="node on"><div>Home</div><i>⌂</i></div>
+                  <div class="node"><div>Morning</div><i>+</i><div>Choose a place</div></div>
+                  <div class="node"><div>Afternoon</div><i>+</i><div>Choose a place</div></div>
+                  <div class="node"><div>Evening</div><i>+</i><div>Choose a place</div></div>
+                  <div class="node on"><div>Home</div><i>⌂</i></div>
+                </div>
+                <div class="day-cards">
+                  <button class="day-card" data-slot="morning" type="button"><span class="ico">☕</span><h4>Morning</h4><p>Start with a coffee</p></button>
+                  <button class="day-card" data-slot="afternoon" type="button"><span class="ico">🌳</span><h4>Afternoon</h4><p>Find a little green</p></button>
+                  <button class="day-card" data-slot="evening" type="button"><span class="ico">🍴</span><h4>Evening</h4><p>Pick a dinner spot</p></button>
+                </div>
+                <div id="picker" hidden>
+                  <h3 id="picker-title" style="font-family:var(--serif);font-weight:500;margin:14px 0 8px">Choose a spot</h3>
+                  <div class="pick-row" id="picker-row"></div>
+                </div>
+                <div class="quiz-foot"><span id="day-count">0 of 3 moments chosen</span><button type="button" id="see-day">See your day →</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="dots" role="tablist" aria-label="Buyer questions">
+          <button class="on" type="button" aria-label="Walk"></button>
+          <button type="button" aria-label="Life"></button>
+          <button type="button" aria-label="Places"></button>
+          <button type="button" aria-label="Commute"></button>
+          <button type="button" aria-label="Day"></button>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="band" id="preview">
-    <p class="kicker">Preview</p>
-    <h2>Let your buyers explore around your listing</h2>
-    <p class="sub">Give them the streets, bakeries, parks and U-Bahn walks around a Berlin home — without sending another PDF.</p>
-    <p class="sub" style="margin-top:12px">Try Kreuzberg, Prenzlauer Berg or Charlottenburg:
-      <button class="preset" data-q="Bergmannstraße 25, 10961 Berlin" type="button" style="background:none;border:0;text-decoration:underline;cursor:pointer;padding:0">Bergmannstraße</button> ·
-      <button class="preset" data-q="Kollwitzstraße 52, 10405 Berlin" type="button" style="background:none;border:0;text-decoration:underline;cursor:pointer;padding:0">Kollwitzstraße</button> ·
-      <button class="preset" data-q="Savignyplatz 5, 10623 Berlin" type="button" style="background:none;border:0;text-decoration:underline;cursor:pointer;padding:0">Savignyplatz</button> ·
-      <button class="preset" data-q="Oranienstraße 190, 10999 Berlin" type="button" style="background:none;border:0;text-decoration:underline;cursor:pointer;padding:0">Oranienstraße</button>
-    </p>
-  </section>
+    <section class="band" id="preview">
+      <p class="kicker"><i></i> PREVIEW</p>
+      <h2>Let your buyers explore around your listing</h2>
+      <p class="sub">The window above is the product. Change the Berlin address, tap a café on the map, open places, time the commute to Alexanderplatz, build a day. Photos are from Wikimedia Commons around Kreuzberg.</p>
+    </section>
 
-  <section class="band" id="process">
-    <p class="kicker">The gap</p>
-    <h2>A listing doesn’t need to stop at the property line</h2>
-    <div class="gap">
-      <div class="files" aria-hidden="true">
-        <span>Listing photos + Grundriss</span>
-        <span>Maps</span>
-        <span>Kiez_report_v3.pdf</span>
-        <span>Shortlist.xlsx</span>
-        <span>Sunday walk-by</span>
+    <section class="band" id="process">
+      <p class="kicker"><i></i> PROCESS</p>
+      <h2>One address in, a whole neighborhood out</h2>
+      <div class="steps">
+        <div><h3>Add an address</h3><p>Start with any Berlin listing or development pin.</p></div>
+        <div><h3>Create the experience</h3><p>Streets, cafés, parks and minutes — assembled from OpenStreetMap.</p></div>
+        <div><h3>Share it anywhere</h3><p>The URL is the tour. No account, nothing stored on a server.</p></div>
       </div>
-      <p class="sub">Buyers already see the Wohnung. To understand the Kiez they still jump between Maps, Immo portals, PDFs, spreadsheets and a walk-by. Kiez puts that missing layer in one place — built from the Berlin address you already have.</p>
-    </div>
-  </section>
+    </section>
 
-  <section class="band">
-    <p class="kicker">Process</p>
-    <h2>One address in, a whole neighborhood out</h2>
-    <p class="sub">Enter the listing, then share the tour or embed it on your exposé site.</p>
-    <div class="steps">
-      <div>
-        <h3>Add an address</h3>
-        <p>Start with any Berlin listing or development pin — Kreuzberg, Mitte, a still-empty plot.</p>
+    <section class="band" id="use-cases">
+      <p class="kicker"><i></i> USE CASES</p>
+      <h2>For agents, brokerages and developers</h2>
+      <div class="uses">
+        <article><h3>Real Estate Agents</h3><p>Send a Kiez tour with the exposé so buyers walk the location before a Saturday Besichtigung.</p></article>
+        <article><h3>Brokerages</h3><p>One neighborhood format across the portfolio.</p></article>
+        <article><h3>Developers</h3><p>Show the Kiez around a site while the building is still a fence.</p></article>
       </div>
-      <div>
-        <h3>Create the experience</h3>
-        <p>Kiez reads the streets, nearby places and walking minutes around that door. You don’t map it by hand.</p>
-      </div>
-      <div>
-        <h3>Share it anywhere</h3>
-        <p>Send a link, embed it on a listing page, or print a QR for the window sign and the Besichtigung.</p>
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="band" id="features">
-    <p class="kicker">Questions your buyers ask</p>
-    <h2>The walk, the errands, the commute.</h2>
-    <div class="asks">
-      <details open>
-        <summary>What does the walk around this home feel like?</summary>
-        <p>Pitch the map and follow the block from the front door — Hinterhöfe, pavement, the actual street, not a walk-score.</p>
-      </details>
-      <details>
-        <summary>What would life here look like for me?</summary>
-        <p>Filter coffee, grocery, park, restaurants. The Kiez is different in Bergmannkiez than at Savignyplatz — show that.</p>
-      </details>
-      <details>
-        <summary>Can I reach my everyday stops easily?</summary>
-        <p>Tap a bakery or Bio-Markt and see walking minutes from this Wohnung, on the street network.</p>
-      </details>
-      <details>
-        <summary>Would this commute work for me?</summary>
-        <p>Type an office in Mitte, a school in Prenzlauer Berg, or Hauptbahnhof. Drive or walk time on real roads.</p>
-      </details>
-      <details>
-        <summary>How would my usual day work here?</summary>
-        <p>Coffee, errands, a park, dinner nearby — assembled from what’s actually mapped around the pin.</p>
-      </details>
-    </div>
-  </section>
-
-  <section class="band" id="use-cases">
-    <p class="kicker">For agents, brokerages and developers</p>
-    <h2>A neighborhood layer that fits how Berlin is sold.</h2>
-    <div class="uses">
-      <article>
-        <h3>Real Estate Agents</h3>
-        <p>Send buyers a Kiez tour with the exposé so they can walk the location before they book a Saturday Besichtigung.</p>
-      </article>
-      <article>
-        <h3>Brokerages</h3>
-        <p>Give every agent the same neighborhood format — not twelve different PDF one-pagers.</p>
-      </article>
-      <article>
-        <h3>Developers</h3>
-        <p>Show streets, places and commutes around a site while the building is still a fence and a rendering.</p>
-      </article>
-    </div>
-  </section>
-
-  <footer class="site-foot">
-    <div>© 2026 Kiez prototype · Map data © OpenStreetMap contributors · Tiles © OpenFreeMap / OpenMapTiles</div>
-    <div>Berlin focus · Not affiliated with Mirai</div>
-  </footer>
-
-  <div class="modal" id="share-modal" hidden>
-    <div class="sheet">
-      <h2>Share this tour</h2>
-      <p style="margin:0;color:#5c5854;font-size:14px">Link, QR or embed. Nothing is stored on a server — the URL is the tour.</p>
-      <input id="share-url" readonly />
-      <div class="row">
-        <img id="qr" alt="QR code" width="160" height="160" />
-        <button class="btn" id="copy-link" type="button">Copy link</button>
-      </div>
-      <label for="embed" style="font-size:12px;color:#5c5854">Embed</label>
-      <textarea id="embed" readonly></textarea>
-      <button class="btn ghost" id="close-share" type="button">Close</button>
-    </div>
+    <footer class="site-foot">
+      <div>© 2026 Kiez prototype · Map data © OpenStreetMap · Photos © Wikimedia Commons · Tiles © OpenFreeMap</div>
+      <div>Berlin · Not affiliated with Mirai</div>
+    </footer>
   </div>
-
   <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
   <script src="assets/app.js"></script>
   <script>Kiez.boot();</script>
