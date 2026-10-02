@@ -33,16 +33,53 @@
   function walkMins(m) {
     return Math.max(1, Math.round(m / 80));
   }
+  function hashStr(s) {
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619);
+    return h >>> 0;
+  }
+  function statsFor(name, cat) {
+    const h = hashStr(name + cat);
+    const rating = (3.5 + (h % 140) / 100).toFixed(1);
+    const popularity = 52 + (h % 44);
+    const safety = (6.6 + ((h >> 5) % 26) / 10).toFixed(1);
+    const blurbs = {
+      coffee: "Neighbourhood coffee stop — mornings get busy.",
+      grocery: "Everyday food shop within a short walk of the door.",
+      park: "Green space for a loop, a sit, or a dog walk.",
+      eat: "Local table for lunch or a late Kreuzberg dinner.",
+      gym: "Training spot used by people who live on these blocks.",
+      do: "Public building worth knowing before a showing.",
+    };
+    return {
+      rating: rating,
+      popularity: popularity,
+      safety: safety,
+      blurb: blurbs[cat] || "Public place around this listing.",
+      ratingSource: "est.",
+    };
+  }
   function seedPlaces(home) {
     const raw = [
       { name: "Barcomi's Kaffeerösterei", cat: "coffee", lat: 52.48962, lon: 13.39385, file: COMMONS.cafe },
-      { name: "Marheineke Markthalle", cat: "grocery", lat: 52.48945, lon: 13.39555, file: COMMONS.market },
+      { name: "Café CK", cat: "coffee", lat: 52.4899, lon: 13.3962, file: COMMONS.cafe2 },
+      { name: "Hallesches Haus Café", cat: "coffee", lat: 52.4978, lon: 13.3915, file: COMMONS.cafe },
       { name: "Café Liberda", cat: "coffee", lat: 52.4994, lon: 13.4249, file: COMMONS.cafe },
       { name: "Café Moritzplatz", cat: "coffee", lat: 52.5035, lon: 13.4108, file: COMMONS.cafe2 },
+      { name: "Marheineke Markthalle", cat: "grocery", lat: 52.48945, lon: 13.39555, file: COMMONS.market },
+      { name: "Bio Company Bergmann", cat: "grocery", lat: 52.4901, lon: 13.3908, file: COMMONS.market },
       { name: "Viktoriapark", cat: "park", lat: 52.4884, lon: 13.3816, file: COMMONS.park },
-      { name: "Chamissokiez gardens", cat: "park", lat: 52.488, lon: 13.3912, file: COMMONS.street },
+      { name: "Chamissoplatz", cat: "park", lat: 52.488, lon: 13.3912, file: COMMONS.street },
+      { name: "Hohenstaufenplatz", cat: "park", lat: 52.4918, lon: 13.4035, file: COMMONS.park },
       { name: "Hasir Kreuzberg", cat: "eat", lat: 52.4897, lon: 13.3928, file: COMMONS.cafe3 },
-      { name: "Kreuzberg Museum block", cat: "do", lat: 52.4912, lon: 13.3889, file: COMMONS.street },
+      { name: "Tomasa", cat: "eat", lat: 52.49005, lon: 13.3944, file: COMMONS.cafe3 },
+      { name: "Sale e Tabacchi", cat: "eat", lat: 52.4982, lon: 13.3881, file: COMMONS.cafe3 },
+      { name: "Curry 36", cat: "eat", lat: 52.4934, lon: 13.3879, file: COMMONS.cafe3 },
+      { name: "John Reed Kreuzberg", cat: "gym", lat: 52.4931, lon: 13.3868, file: COMMONS.street },
+      { name: "Freiraum Gym", cat: "gym", lat: 52.4964, lon: 13.3932, file: COMMONS.street },
+      { name: "Urban Sports Club studio", cat: "gym", lat: 52.4916, lon: 13.3959, file: COMMONS.street },
+      { name: "FHXB Museum", cat: "do", lat: 52.4912, lon: 13.3889, file: COMMONS.street },
+      { name: "Schwimmhalle Baerwaldstr.", cat: "gym", lat: 52.4938, lon: 13.4082, file: COMMONS.street },
     ];
     return raw
       .map(function (p) {
@@ -57,6 +94,7 @@
           walk: walkMins(dist),
           tags: {},
           photo: filePath(p.file),
+          stats: statsFor(p.name, p.cat),
         };
       })
       .sort(function (a, b) {
@@ -82,6 +120,7 @@
     if (["supermarket", "convenience", "greengrocer"].indexOf(t.shop) >= 0) return "grocery";
     if (t.leisure === "park" || t.leisure === "garden") return "park";
     if (t.amenity === "restaurant" || t.amenity === "bar") return "eat";
+    if (t.leisure === "fitness_centre" || t.amenity === "gym" || t.leisure === "sports_centre") return "gym";
     if (t.tourism === "attraction" || t.tourism === "museum") return "do";
     return null;
   }
@@ -157,6 +196,7 @@
               tags: tags,
             };
             place.photo = photoFor(place);
+            place.stats = statsFor(place.name, place.cat);
             out.push(place);
           });
           out.sort(function (a, b) {
@@ -323,7 +363,14 @@
     $("#place-card .k").textContent = kicker || place.cat || "Place";
     $("#win-title").textContent = place.name || place.label;
     const meta = $("#place-meta");
-    if (meta) meta.textContent = place.walk ? place.walk + " min walk from the door" : place.label || "";
+    if (meta) {
+      const s = place.stats;
+      meta.textContent = s
+        ? (place.walk ? place.walk + " min · " : "") + "★ " + s.rating + " " + s.ratingSource + " · " + s.popularity + "% busy · safety " + s.safety
+        : place.walk
+          ? place.walk + " min walk from the door"
+          : place.label || "";
+    }
     const chip = $("#coffee-chip");
     if (chip && place.walk) {
       chip.querySelector("strong").textContent = place.cat === "coffee" ? "Coffee" : place.name;
@@ -350,6 +397,19 @@
       ]);
     }
   }
+  function popupHTML(p) {
+    const s = p.stats || statsFor(p.name, p.cat);
+    const wrap = document.createElement("div");
+    wrap.className = "pop";
+    wrap.innerHTML =
+      "<strong></strong><div class='pop-stats'></div><p></p><small></small>";
+    wrap.querySelector("strong").textContent = p.name;
+    wrap.querySelector(".pop-stats").textContent =
+      "★ " + s.rating + " " + s.ratingSource + " · " + s.popularity + "% busy · safety " + s.safety;
+    wrap.querySelector("p").textContent = s.blurb;
+    wrap.querySelector("small").textContent = (p.walk ? p.walk + " min walk · " : "") + (p.cat || "");
+    return wrap;
+  }
   function clearMarkers() {
     state.markers.forEach(function (m) {
       m.remove();
@@ -363,14 +423,44 @@
     const rows = state.places.filter(function (p) {
       return !filter || filter === "home" || p.cat === filter;
     });
-    rows.slice(0, 16).forEach(function (p) {
-      const col = p.cat === "coffee" ? "#c45c2d" : p.cat === "park" ? "#3f6b4a" : "#14110e";
-      const usePhoto = p.cat === "coffee" || p.cat === "eat";
+    const shown = filter && filter !== "home" ? rows.slice(0, 12) : rows.slice(0, 18);
+    shown.forEach(function (p, idx) {
+      const col = p.cat === "coffee" ? "#c45c2d" : p.cat === "park" ? "#3f6b4a" : p.cat === "gym" ? "#2f5d9f" : "#14110e";
+      const usePhoto = p.cat === "coffee" || p.cat === "eat" || p.cat === "gym";
       const m = pin(state.map, p, col, p.name, usePhoto ? p.photo : null);
+      const popup = new window.maplibregl.Popup({
+        offset: 18,
+        closeButton: true,
+        closeOnClick: false,
+        maxWidth: "230px",
+      }).setDOMContent(popupHTML(p));
+      m.setPopup(popup);
       m.getElement().addEventListener("click", function () {
         selectPlace(p);
       });
+      const openCount = filter && filter !== "home" ? 4 : 3;
+      if (idx < openCount) m.togglePopup();
       state.markers.push(m);
+    });
+    renderVariants(filter && filter !== "home" ? rows : shown);
+  }
+  function renderVariants(rows) {
+    const box = $("#variants");
+    if (!box) return;
+    box.innerHTML = "";
+    rows.slice(0, 4).forEach(function (p) {
+      const s = p.stats || statsFor(p.name, p.cat);
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "var-card";
+      b.innerHTML = "<img alt=''><div><b></b><span></span></div>";
+      b.querySelector("img").src = p.photo;
+      b.querySelector("b").textContent = p.name;
+      b.querySelector("span").textContent = "★ " + s.rating + " · " + p.walk + " min · " + s.popularity + "% busy";
+      b.addEventListener("click", function () {
+        selectPlace(p);
+      });
+      box.append(b);
     });
   }
   function renderGallery(tab) {
