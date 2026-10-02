@@ -438,7 +438,7 @@
       m.getElement().addEventListener("click", function () {
         selectPlace(p);
       });
-      const openCount = filter && filter !== "home" ? 4 : 3;
+      const openCount = filter && filter !== "home" ? 3 : 2;
       if (idx < openCount) m.togglePopup();
       state.markers.push(m);
     });
