@@ -38,9 +38,11 @@
     for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619);
     return h >>> 0;
   }
-  function statsFor(name, cat) {
+  function statsFor(name, cat, extras) {
+    extras = extras || {};
     const h = hashStr(name + cat);
-    const rating = (3.5 + (h % 140) / 100).toFixed(1);
+    const rating =
+      extras.rating != null ? Number(extras.rating).toFixed(1) : (3.5 + (h % 140) / 100).toFixed(1);
     const popularity = 52 + (h % 44);
     const safety = (6.6 + ((h >> 5) % 26) / 10).toFixed(1);
     const blurbs = {
@@ -55,31 +57,32 @@
       rating: rating,
       popularity: popularity,
       safety: safety,
-      blurb: blurbs[cat] || "Public place around this listing.",
-      ratingSource: "est.",
+      blurb: extras.blurb || blurbs[cat] || "Public place around this listing.",
+      ratingSource: extras.rating != null ? "Google" : "est.",
     };
   }
   function seedPlaces(home) {
     const raw = [
-      { name: "Barcomi's Kaffeerösterei", cat: "coffee", lat: 52.48962, lon: 13.39385, file: COMMONS.cafe },
-      { name: "Café CK", cat: "coffee", lat: 52.4899, lon: 13.3962, file: COMMONS.cafe2 },
-      { name: "Hallesches Haus Café", cat: "coffee", lat: 52.4978, lon: 13.3915, file: COMMONS.cafe },
-      { name: "Café Liberda", cat: "coffee", lat: 52.4994, lon: 13.4249, file: COMMONS.cafe },
-      { name: "Café Moritzplatz", cat: "coffee", lat: 52.5035, lon: 13.4108, file: COMMONS.cafe2 },
-      { name: "Marheineke Markthalle", cat: "grocery", lat: 52.48945, lon: 13.39555, file: COMMONS.market },
-      { name: "Bio Company Bergmann", cat: "grocery", lat: 52.4901, lon: 13.3908, file: COMMONS.market },
-      { name: "Viktoriapark", cat: "park", lat: 52.4884, lon: 13.3816, file: COMMONS.park },
-      { name: "Chamissoplatz", cat: "park", lat: 52.488, lon: 13.3912, file: COMMONS.street },
-      { name: "Hohenstaufenplatz", cat: "park", lat: 52.4918, lon: 13.4035, file: COMMONS.park },
-      { name: "Hasir Kreuzberg", cat: "eat", lat: 52.4897, lon: 13.3928, file: COMMONS.cafe3 },
-      { name: "Tomasa", cat: "eat", lat: 52.49005, lon: 13.3944, file: COMMONS.cafe3 },
-      { name: "Sale e Tabacchi", cat: "eat", lat: 52.4982, lon: 13.3881, file: COMMONS.cafe3 },
-      { name: "Curry 36", cat: "eat", lat: 52.4934, lon: 13.3879, file: COMMONS.cafe3 },
-      { name: "John Reed Kreuzberg", cat: "gym", lat: 52.4931, lon: 13.3868, file: COMMONS.street },
-      { name: "Freiraum Gym", cat: "gym", lat: 52.4964, lon: 13.3932, file: COMMONS.street },
-      { name: "Urban Sports Club studio", cat: "gym", lat: 52.4916, lon: 13.3959, file: COMMONS.street },
-      { name: "FHXB Museum", cat: "do", lat: 52.4912, lon: 13.3889, file: COMMONS.street },
-      { name: "Schwimmhalle Baerwaldstr.", cat: "gym", lat: 52.4938, lon: 13.4082, file: COMMONS.street },
+      { name: "Barcomi's Café & Kaffeerösterei", cat: "coffee", lat: 52.489026, lon: 13.39338, file: COMMONS.cafe, rating: 4.3, blurb: "1994 Bergmannkiez roastery — cheesecake, bagels, on-site cakes." },
+      { name: "Coffee Cult", cat: "coffee", lat: 52.489341, lon: 13.393251, file: COMMONS.cafe2, rating: 4.7, blurb: "Busy self-service café for espresso, breakfast and cheesecake." },
+      { name: "Jederzeit Café", cat: "coffee", lat: 52.489416, lon: 13.392622, file: COMMONS.cafe, rating: 4.6, blurb: "All-day brunch: shakshuka, egg-drop sandwiches, house cakes." },
+      { name: "Kalimera Café", cat: "coffee", lat: 52.489313, lon: 13.394158, file: COMMONS.market, rating: 4.8, blurb: "Greek coffee stall in Marheineke Markthalle — kataifi and portokalopita." },
+      { name: "cuccuma", cat: "coffee", lat: 52.490584, lon: 13.394355, file: COMMONS.cafe2, rating: 4.4, blurb: "Two-floor specialty coffee, daily cakes, laptop-friendly upstairs." },
+      { name: "Chapter One Coffee", cat: "coffee", lat: 52.489785, lon: 13.39569, file: COMMONS.cafe, rating: 4.6, blurb: "Tiny brew bar: siphon, V60, espresso." },
+      { name: "Café ZIZOU", cat: "coffee", lat: 52.48905, lon: 13.402822, file: COMMONS.cafe2, rating: 4.9, blurb: "Backyard-garden café; owner bakes cakes and sourdough daily." },
+      { name: "Two Trick Pony", cat: "coffee", lat: 52.488894, lon: 13.40491, file: COMMONS.cafe, rating: 4.5, blurb: "Neighbourhood brunch café with a street terrace." },
+      { name: "Marheineke Markthalle", cat: "grocery", lat: 52.48945, lon: 13.39555, file: COMMONS.market, rating: 4.4, blurb: "Historic Markthalle XI — produce, bakeries, food stalls. Closed Sundays." },
+      { name: "Viktoriapark", cat: "park", lat: 52.4884, lon: 13.3816, file: COMMONS.park, rating: 4.5, blurb: "Heritage park on Kreuzberg hill, waterfall in season, Golgatha beer garden." },
+      { name: "Chamissoplatz", cat: "park", lat: 52.488, lon: 13.3912, file: COMMONS.street, blurb: "Gründerzeit square with a large playground and weekly Ökomarkt." },
+      { name: "Felix Austria", cat: "eat", lat: 52.4891, lon: 13.3941, file: COMMONS.cafe3, rating: 4.7, blurb: "Kiez schnitzel house with a terrace on Bergmannstraße." },
+      { name: "Pagode", cat: "eat", lat: 52.4893, lon: 13.3935, file: COMMONS.cafe3, rating: 4.3, blurb: "Long-running Thai kitchen on Bergmannstraße." },
+      { name: "Austria", cat: "eat", lat: 52.4892, lon: 13.3948, file: COMMONS.cafe3, rating: 4.7, blurb: "Bergmannkiez institution for Wiener schnitzel since 1993." },
+      { name: "Tibet Haus", cat: "eat", lat: 52.4902, lon: 13.3949, file: COMMONS.cafe3, rating: 4.6, blurb: "Small momo and curry room just off Marheinekeplatz." },
+      { name: "Golgatha", cat: "eat", lat: 52.4874, lon: 13.3819, file: COMMONS.park, rating: 4.3, blurb: "Viktoriapark beer garden since 1977 — grill, beer, late music." },
+      { name: "Yoga-Institut Berlin", cat: "gym", lat: 52.4894, lon: 13.3929, file: COMMONS.street, rating: 4.4, blurb: "Independent yoga studio on Bergmannstraße." },
+      { name: "Black Sheep Athletics", cat: "gym", lat: 52.4878, lon: 13.3855, file: COMMONS.street, rating: 4.9, blurb: "CrossFit and HYROX box on Am Tempelhofer Berg." },
+      { name: "FitnessCenter aTB", cat: "gym", lat: 52.4879, lon: 13.3854, file: COMMONS.street, rating: 4.5, blurb: "Old-school gym with weights, courses and sauna." },
+      { name: "Jewish Museum Berlin", cat: "do", lat: 52.502, lon: 13.395, file: COMMONS.street, rating: 4.4, blurb: "Libeskind building; core exhibition free. Closed Mondays." },
     ];
     return raw
       .map(function (p) {
@@ -94,7 +97,7 @@
           walk: walkMins(dist),
           tags: {},
           photo: filePath(p.file),
-          stats: statsFor(p.name, p.cat),
+          stats: statsFor(p.name, p.cat, p),
         };
       })
       .sort(function (a, b) {
