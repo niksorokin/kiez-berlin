@@ -312,6 +312,56 @@
     }
     tick();
   }
+  function journeyPack(place) {
+    const cat = (place && place.cat) || "coffee";
+    const packs = {
+      coffee: {
+        street: { img: "assets/img/street-walk.webp", cap: "Outside the listing. Illustrative street — AI-generated." },
+        walk: { img: null, cap: "Live walking route from the door." },
+        arrive: { img: place && place.photo, cap: "Arrive at " + (place && place.name ? place.name : "the café") + "." },
+        inside: { img: "assets/img/enter/cafe-int.webp", cap: "Illustrative interior — AI-generated; not a verified depiction of this venue." },
+      },
+      grocery: {
+        street: { img: "assets/img/street-walk.webp", cap: "Outside the listing. Illustrative street — AI-generated." },
+        walk: { img: null, cap: "Live walking route to the market hall." },
+        arrive: { img: place && place.photo, cap: "Arrive at Marheineke Markthalle." },
+        inside: { img: "assets/img/enter/market-int.webp", cap: "Illustrative interior — AI-generated; not a verified depiction of this venue." },
+      },
+      gym: {
+        street: { img: "assets/img/street-walk.webp", cap: "Outside the listing. Illustrative street — AI-generated." },
+        walk: { img: null, cap: "Live walking route to the gym." },
+        arrive: { img: place && place.photo, cap: "Arrive at " + (place && place.name ? place.name : "the gym") + "." },
+        inside: { img: "assets/img/enter/gym-int.webp", cap: "Illustrative interior — AI-generated; not a verified depiction of this venue." },
+      },
+    };
+    return packs[cat] || packs.coffee;
+  }
+  function showJourneyStep(id) {
+    const pack = state.journeyPack;
+    if (!pack || !pack[id]) return;
+    document.querySelectorAll("[data-j]").forEach(function (b) {
+      b.classList.toggle("on", b.getAttribute("data-j") === id);
+    });
+    const step = pack[id];
+    const img = $("#j-img");
+    $("#j-cap").textContent = step.cap;
+    if (id === "walk") {
+      img.hidden = true;
+      $("#journey").style.background = "transparent";
+      if (state.lastRoute) experience(state.map, state.lastRoute);
+    } else {
+      $("#journey").style.background = "#111";
+      img.hidden = false;
+      if (step.img) img.src = step.img;
+    }
+  }
+  async function startJourney(place) {
+    if (!place) return;
+    await selectPlace(place);
+    state.journeyPack = journeyPack(place);
+    $("#journey").hidden = false;
+    showJourneyStep("street");
+  }
   const COPY = [
     {
       id: "walk",
@@ -347,6 +397,7 @@
     markers: [],
     slide: 0,
     lastRoute: null,
+    selected: null,
     household: {},
     interests: {},
     day: { morning: null, afternoon: null, evening: null },
@@ -384,6 +435,7 @@
   }
   async function selectPlace(place) {
     if (!state.map || !state.home || !place) return;
+    state.selected = place;
     setCard(place, place.cat === "coffee" ? "Coffee" : place.cat);
     state.map.flyTo({ center: [place.lon, place.lat], zoom: 17, pitch: 62, speed: 0.75 });
     try {
@@ -441,7 +493,7 @@
       m.getElement().addEventListener("click", function () {
         selectPlace(p);
       });
-      const openCount = filter && filter !== "home" ? 3 : 2;
+      const openCount = 0;
       if (idx < openCount) m.togglePopup();
       state.markers.push(m);
     });
@@ -663,13 +715,17 @@
     const play = $("#play-route");
     if (play)
       play.addEventListener("click", function () {
-        if (state.lastRoute) experience(state.map, state.lastRoute);
-        else {
-          const p = nearest("coffee");
-          if (p) selectPlace(p).then(function () {
-            if (state.lastRoute) experience(state.map, state.lastRoute);
-          });
-        }
+        startJourney(state.selected || nearest("coffee"));
+      });
+    document.querySelectorAll("[data-j]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        showJourneyStep(b.getAttribute("data-j"));
+      });
+    });
+    const jc = $("#j-close");
+    if (jc)
+      jc.addEventListener("click", function () {
+        $("#journey").hidden = true;
       });
     document.querySelectorAll(".hh").forEach(function (btn) {
       btn.addEventListener("click", function () {
