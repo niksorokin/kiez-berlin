@@ -491,6 +491,29 @@
       e.preventDefault();
       loadAddress($("#address").value);
     });
+    document.querySelectorAll("[data-fly]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        document.querySelectorAll("[data-fly]").forEach(function (x) {
+          x.setAttribute("aria-pressed", "false");
+        });
+        b.setAttribute("aria-pressed", "true");
+        const cat = b.getAttribute("data-fly");
+        if (!state.map || !state.home) return;
+        if (cat === "home") {
+          state.map.flyTo({ center: [state.home.lon, state.home.lat], zoom: 16.2, pitch: 60, speed: 0.8 });
+          $("#place-card .k").textContent = "Home";
+          $("#win-title").textContent = state.home.label;
+          return;
+        }
+        const p = nearest(cat);
+        if (!p) return;
+        state.map.flyTo({ center: [p.lon, p.lat], zoom: 17, pitch: 62, speed: 0.8 });
+        $("#place-card .k").textContent = cat;
+        $("#win-title").textContent = p.name;
+        $("#coffee-chip strong").textContent = p.name;
+        $("#coffee-chip small").textContent = p.walk + " min walk";
+      });
+    });
     document.querySelectorAll(".hh").forEach(function (btn) {
       btn.addEventListener("click", function () {
         const k = btn.getAttribute("data-k");

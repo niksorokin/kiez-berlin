@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="assets/styles.css" />
 </head>
 <body>
-  <div class="frame">
+  <div class="cream">
     <header class="top">
       <a class="brand" href="index.html">Kiez</a>
       <nav class="nav">
@@ -23,7 +23,36 @@
       </nav>
       <button class="signin" type="button" title="Accounts aren't live in this prototype." aria-disabled="true">Sign in</button>
     </header>
+    <section class="cream-hero" id="main">
+      <div>
+        <h1>Help buyers picture life around your listing.</h1>
+        <p class="lede">Turn a Berlin address into an interactive neighborhood tour your buyers can explore before a showing.</p>
+        <a class="btn-dark" href="#map-stage">Open the map</a>
+      </div>
+      <div class="stage" id="map-stage">
+        <div id="map" role="application" aria-label="Berlin neighborhood map"></div>
+        <div class="loader" id="loader">Building this Kiez…</div>
+        <form class="addr-float" id="addr-form">
+          <input id="address" value="Bergmannstraße 25, 10961 Berlin" aria-label="Listing address" />
+          <button type="submit">Create</button>
+        </form>
+        <div class="cats-float" role="toolbar" aria-label="Place filters">
+          <button type="button" data-fly="home" aria-pressed="true">Home</button>
+          <button type="button" data-fly="coffee">Coffee</button>
+          <button type="button" data-fly="grocery">Grocery</button>
+          <button type="button" data-fly="park">Park</button>
+          <button type="button" data-fly="eat">Restaurant</button>
+        </div>
+        <div class="chip" id="coffee-chip"><strong>Coffee</strong><small>timing walk…</small></div>
+        <div class="place-float" id="place-card">
+          <div class="k">Home</div>
+          <h3 id="win-title">Bergmannstraße 25</h3>
+        </div>
+      </div>
+    </section>
+  </div>
 
+  <div class="frame">
     <section class="hero" id="features">
       <div>
         <p class="kicker"><i></i> QUESTIONS YOUR BUYERS ASK</p>
@@ -34,18 +63,12 @@
         <div class="win">
           <div class="win-bar">
             <div class="traffic" aria-hidden="true"><b></b><b></b><b></b></div>
-            <span id="win-title">Bergmannstraße 25</span>
+            <span id="feat-title">Bergmannstraße 25</span>
           </div>
           <div class="win-body">
-            <div class="loader" id="loader">Building this Kiez…</div>
-
             <div class="pane" data-pane="walk">
-              <div id="map" role="application" aria-label="Berlin neighborhood map"></div>
-              <form class="addr-float" id="addr-form">
-                <input id="address" value="Bergmannstraße 25, 10961 Berlin" aria-label="Listing address" />
-                <button type="submit">Create</button>
-              </form>
-              <div class="chip" id="coffee-chip"><strong>Coffee</strong><small>timing walk…</small></div>
+              <img class="walk-still" src="assets/img/street-walk.webp" alt="Street around a Berlin listing" />
+              <div class="chip"><strong>Coffee</strong><small>1 min walk</small></div>
             </div>
 
             <div class="pane" data-pane="life" hidden>
@@ -158,9 +181,18 @@
       <p class="kicker"><i></i> USE CASES</p>
       <h2>For agents, brokerages and developers</h2>
       <div class="uses">
-        <article><h3>Real Estate Agents</h3><p>Send a Kiez tour with the exposé so buyers walk the location before a Saturday Besichtigung.</p></article>
-        <article><h3>Brokerages</h3><p>One neighborhood format across the portfolio.</p></article>
-        <article><h3>Developers</h3><p>Show the Kiez around a site while the building is still a fence.</p></article>
+        <article>
+          <img src="assets/img/audience-agents.webp" alt="" />
+          <div class="pad"><h3>Real Estate Agents</h3><p>Send a Kiez tour with the exposé so buyers walk the location before a Saturday Besichtigung.</p></div>
+        </article>
+        <article>
+          <img src="assets/img/audience-broker.webp" alt="" />
+          <div class="pad"><h3>Brokerages</h3><p>One neighborhood format across the portfolio.</p></div>
+        </article>
+        <article>
+          <img src="assets/img/audience-dev.webp" alt="" />
+          <div class="pad"><h3>Developers</h3><p>Show the Kiez around a site while the building is still a fence.</p></div>
+        </article>
       </div>
     </section>
 

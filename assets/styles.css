@@ -318,3 +318,79 @@ img { max-width: 100%; display: block; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
 }
+
+/* Cream main screen — Mirai first-viewport posture */
+.cream {
+  background: #f4f4f1;
+  color: #100d0c;
+}
+.cream .top { color: #100d0c; }
+.cream .nav { color: #3a342c; }
+.cream .signin {
+  background: #fff;
+  color: #100d0c;
+  border: 1px solid #d9d4cc;
+  cursor: not-allowed;
+}
+.cream-hero {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.85fr) minmax(420px, 1.2fr);
+  gap: 28px;
+  padding: 8px 48px 40px;
+  align-items: center;
+  min-height: calc(100dvh - 80px);
+}
+.cream-hero h1 {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(36px, 4.4vw, 56px);
+  line-height: 1;
+  letter-spacing: -0.05em;
+  margin: 0 0 16px;
+  max-width: 13ch;
+  color: #100d0c;
+}
+.cream-hero .lede { color: #5c5854; max-width: 36ch; margin: 0 0 24px; }
+.cream-hero .btn-dark {
+  display: inline-flex;
+  background: #100d0c;
+  color: #fff;
+  border: 0;
+  border-radius: 4px;
+  padding: 10px 32px;
+  font-family: var(--serif);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.stage {
+  position: relative;
+  min-height: min(70vh, 640px);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #ddd8cf;
+  box-shadow: 0 18px 50px rgba(16,13,12,.12);
+}
+.stage #map { position: absolute; inset: 0; }
+.place-float {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  z-index: 4;
+  background: #f7f6f2;
+  border-radius: 10px;
+  padding: 12px 14px;
+  min-width: 200px;
+  box-shadow: 0 10px 28px rgba(16,13,12,.12);
+  color: #100d0c;
+}
+.place-float .k { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: #6d6458; }
+.place-float h3 { margin: 4px 0 0; font-family: var(--serif); font-weight: 500; font-size: 18px; }
+.walk-still { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+.uses article { overflow: hidden; padding: 0; }
+.uses article img { width: 100%; height: 140px; object-fit: cover; }
+.uses article .pad { padding: 16px 20px 20px; }
+@media (max-width: 980px) {
+  .cream-hero { grid-template-columns: 1fr; padding: 8px 18px 28px; min-height: 0; }
+  .stage { min-height: 70dvh; }
+}
